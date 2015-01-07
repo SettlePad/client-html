@@ -1,0 +1,8 @@
+{{#each transactions}}
+  <li class="list-group-item" id="sendlist_{{id}}">
+    <span class="memo_list_amount text-{{#if amount_negative}}danger{{else}}success{{/if}}">{{currency}} {{amount_formatted}}</span>
+    <h5 class="list-group-item-heading">{{description}}</h5>
+    <a href="javascript:void(0);" onclick="send_remove({{id}});" class="memo_list_remove">remove</a>
+    <p class="list-group-item-text">To {{#if name_available}}{{name}} ({{recipient}}){{else}}{{recipient}}{{/if}}</p>
+  </li>
+{{/each}}

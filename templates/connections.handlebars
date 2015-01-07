@@ -1,0 +1,59 @@
+<ul class="nav nav-tabs" role="tablist">
+  <li><a href="#profile">Profile</a></li>
+  <li class="active"><a href="#connections">Connections</a></li>
+</ul>
+
+{{#if connections}}
+  <div class="table-responsive">
+    <table class="table table-hover">
+  	<thead>
+  	  <tr>
+  		<th></th>
+  		<th>Friendly name</th>
+  		<th class="text-nowrap">Auto accept UOMes <a href="javascript:void(0);" tabindex="0" id="connections_popover_auto_accept" data-toggle="popover" data-trigger="focus" title="Auto accept UOMes" data-content="Automatically accept UOMes you receive from a specific connection, up to the specified limit. If activated, IOUs you receive from this connection in your primary currency will always be accepted automatically." data-container="body"  data-placement="bottom"><span class="glyphicon glyphicon-info-sign"></span></a></th>
+  		<th class="text-nowrap">Favorite debtor <a href="javascript:void(0);" tabindex="0" id="connections_popover_favorite_debtor" data-toggle="popover" data-trigger="focus" title="Favorite debtor" data-content="UOless allocates as much as possible of the receivables to your starred connections. So now you can pay beer for friend A (who is a lousy debtor to you) and instead, get it back from starred friend B." data-container="body" data-placement="bottom"><span class="glyphicon glyphicon-info-sign"></span></a></th>
+  	  </tr>
+  	</thead>
+  	<tbody>
+      {{#each connections}}
+    	  <tr>
+      		<td>
+      			<ul class="list-unstyled">
+      				<li><strong>{{name}}</strong></li>
+                {{#each identifiers}}
+      				      <li>{{#unless active}}<s>{{/unless}}{{identifier}}{{#unless active}}</s>{{/unless}}</li>
+                {{/each}}
+      			</ul>
+      		</td>
+      		<td>
+      			<form class="form-inline" role="form">
+      				<div class="form-group connections_formgroup">
+      					<label class="sr-only" for="connection_name_{{id}}">Friendly name</label>
+      					<input type="text" class="form-control connections_name" id="connection_name_{{id}}" placeholder="{{name}}" maxlength="100" value="{{#if friendly_name}}{{friendly_name}}{{/if}}">
+      				</div>
+      			</form>
+      		</td>
+      		<td>
+      			<form class="form-inline" role="form">
+      				<div class="checkbox">
+      					<label>
+      						<input type="checkbox" class="connections_limit_checkbox" id="connection_auto_accept_{{id}}" {{#if auto_limit}}checked{{/if}}>
+      					</label>
+      				</div>
+      				<div class="form-group connections_formgroup">
+      					<label class="sr-only" for="connection_limit_{{id}}">Limit</label>
+      					<input type="text" class="form-control connections_limit_inputbox" id="connection_limit_{{id}}" placeholder="Limit [EUR]" value="{{#if auto_limit}}{{auto_limit}}{{/if}}"> <!-- TODO: Dynamic currency -->
+      				</div>
+      			</form>
+      		</td>
+      		<td>
+      			<a href="javascript:connections_submit('{{id}}','favorite');"><span id="connection_favorite_{{id}}" class="glyphicon {{#if favorite}}glyphicon-star connections_yellow{{else}}glyphicon-star-empty text-muted{{/if}} connections_star"></span></a>
+      		</td>
+    	  </tr>
+      {{/each}}
+  	</tbody>
+    </table>
+  </div>
+{{else}}
+  <p>You did not send or receive a UOMe yet.</p>
+{{/if}}

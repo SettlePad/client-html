@@ -1,0 +1,105 @@
+.text_bold {
+	font-weight: bold;
+}
+
+.text_right {
+	text-align: right;
+}
+
+.text_center {
+	text-align: center;
+}
+
+.transactions_amount {
+	float: right;
+	display: inline-block;
+	min-width: 10px;
+	padding: 3px 7px;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1;
+	vertical-align: baseline;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.transactions_block {
+	cursor: pointer;
+}
+
+.transactions_buttons {
+	margin-top: 10px;
+	margin-bottom: 3px;
+}
+
+.form-feedback-no-label {
+	top: 0px !important;
+}
+
+.tt-dropdown-menu {
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.memo_left {
+	float: left;
+	margin-right: 10px;
+}
+
+.memo_right {
+	/*overflow: hidden*/
+}
+
+.memo_list_amount {
+	float: right;
+	display: inline-block;
+	min-width: 10px;
+	padding: 3px 7px;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1;
+	vertical-align: baseline;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.memo_list_remove {
+	float: right;
+	display: inline-block;
+	min-width: 10px;
+	padding: 3px 7px;
+	line-height: 1;
+	vertical-align: baseline;
+	text-align: center;
+}
+
+.nav-tabs { /* used in settings page*/
+	margin-bottom: 15px;
+}
+
+@-moz-document url-prefix() { /* hack for responsive tables in firefox, see bootstrap manual */
+	fieldset { display: table-cell; }
+}
+
+.connections_star {
+	font-size: 24px;
+}
+.connections_yellow {
+	color: #FFC517;
+}
+.form-inline .form-control.connections_limit_inputbox {
+	width:100px;
+}
+.form-inline .checkbox input[type="checkbox"].connections_limit_checkbox {
+	position: relative; /* does not work yet! */
+}
+.form-inline .form-control.connections_name {
+	width:150px;
+}
+
+.form-inline .form-group.connections_formgroup {
+	display: inline-block;
+}
+.form-inline .checkbox {
+	display: inline;
+}

@@ -1,0 +1,50 @@
+@media (min-width: 992px) {
+	body {
+		padding-top: 20px;
+	}
+}
+@media (max-width: 991px) {
+	body {
+		padding-top: 0px;
+	}
+	.navbar-brand {
+		margin-bottom: 0px;
+	}
+}
+
+body {
+  padding-bottom: 20px;
+}
+
+.logo {
+	margin-bottom: 20px;
+}
+
+.bootstrap-growl {
+	text-align: center;
+	padding: 5px;
+}
+
+.icon-login-google {
+	background-image: url("../img/g14.png");
+}
+
+.icon-login-facebook {
+	background-image: url("../img/f14.png");
+}
+
+[class^="icon-"],
+[class*=" icon-"] {
+	background-position: 0% 0%;
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	margin-top: 1px;
+	line-height: 14px;
+	vertical-align: text-top;
+	background-repeat: no-repeat;
+}
+
+.forgot_pwd_div {
+	margin-top: 10px;
+}

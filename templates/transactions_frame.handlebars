@@ -1,0 +1,20 @@
+<form role="form" id="transactions_searchform">
+	<div class="form-group has-feedback">
+		<input type="text" class="form-control" placeholder="Search" id="transactions_searchinput" value="{{search}}">
+		<a href="javascript:transaction_search();"><span class="glyphicon glyphicon-search form-control-feedback form-feedback-no-label"></span></a>
+	</div>
+</form>
+{{#if transactions_present}}
+	<div class="list-group" id="transactions_list"></div>
+	<div class="center-block text_center" id="transactions_load_button">
+			<a href="javascript:transactions_older();" class="btn btn-default">Load more</a>
+	</div>
+	<div class="center-block text_center hidden" id="transactions_load_loader">
+			<img src="img/ajax-loader.gif" alt="Loading more...">
+	</div>
+	<div class="center-block text_center hidden" id="transactions_end_reached">
+			<p class="text-muted">No more results: you've reached the last transaction.</p>
+	</div>
+{{else}}
+	<p>There are no (matching) transactions.</p>
+{{/if}}
