@@ -1,0 +1,27 @@
+{{#if currencies}}
+  <div class="panel panel-default">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+        <th></th>
+        <th class="text_right">You owe</th>
+        <th class="text_right">You get</th>
+        <th class="text_right">Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each currencies}}
+          <tr class="table-striped">
+            <td><a href="#balance_{{currency}}">{{currency}}</a></td>
+            <td class="text_right"><span class="text-danger">{{#if owe_active}}{{owe_formatted}}{{/if}}</span></td>
+            <td class="text_right"><span class="text-success">{{#if get_active}}{{get_formatted}}{{/if}}</span></td>
+            <td class="text_right"><span class="text-{{#if balance_negative}}danger{{else}}success{{/if}}">{{balance_formatted}}</span></td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+{{else}}
+  <p>You do not get anything or owe anyone!</p>
+  <!-- TODO: welcome text -->
+{{/if}}

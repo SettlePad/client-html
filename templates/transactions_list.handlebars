@@ -1,0 +1,26 @@
+{{#each transactions}}
+  <span onclick="transaction_toggle(this);" class="list-group-item transactions_block" id="transaction_{{transaction_id}}">
+    <span class="transactions_amount text-{{#if status_canceled}}muted{{else}}{{#if amount_negative}}danger{{else}}success{{/if}}{{/if}}">{{#if status_canceled}}<s>{{/if}}{{currency}} {{amount_formatted}}{{#if status_canceled}}</s>{{/if}}</span>
+    <h5 class="list-group-item-heading">{{#if status_canceled}}<s>{{/if}}{{description}}{{#if status_canceled}}</s>{{/if}} {{#if status_canceled}}<span class="label label-default">canceled</span>{{else}}{{#if status_pending}}<span class="label label-warning">not yet approved</span>{{else}}{{#unless reduced}} <span class="label label-info">processing</span> {{/unless}}{{/if}}{{/if}}</h5>
+    <div class="transaction_anti_toggle">
+      <p class="list-group-item-text">{{#if status_canceled}}<s>{{/if}}{{#if is_sender}}To{{else}}From{{/if}} {{counterpart_name}}{{#unless recipient_registered}} (not registered){{/unless}}, {{time_sent_humane}}{{#if status_canceled}}</s>{{/if}}</p>
+    </div>
+    <div class="hidden transaction_toggle">
+      <p class="list-group-item-text">{{#if is_sender}}To{{else}}From{{/if}}: {{counterpart_name}} {{#unless recipient_registered}}(not registered){{/unless}} ({{counterpart_id}})</p>
+      <p class="list-group-item-text">Time sent: {{time_sent_formatted}}</p>
+      <p class="list-group-item-text">Status: {{#if status_pending}}Approval pending, not accounted for in balance{{/if}}{{#if status_canceled}}Canceled{{/if}}</p>
+      <p class="list-group-item-text">ID: {{transaction_id}}</p>
+    </div>
+    {{#if can_accept}}
+      <p class="transactions_buttons">
+        <a href="javascript:transaction_accept({{transaction_id}}, 'accept');" class="btn btn-primary" role="button">Accept</a>
+        <a href="javascript:transaction_accept({{transaction_id}}, 'reject');" class="btn btn-default" role="button">Reject</a>
+      </p>
+    {{/if}}
+    {{#if can_cancel}}
+      <p class="transactions_buttons">
+        <a href="javascript:transaction_accept({{transaction_id}}, 'cancel');" class="btn btn-default" role="button">Cancel</a>
+      </p>
+    {{/if}}
+  </span>
+{{/each}}
