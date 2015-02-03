@@ -18,8 +18,8 @@ jQuery.ajaxWrapper = function(resource, type, secure, data, notification, ajaxOp
 	$.ajax($.extend({
 		type: type,
 		contentType: contenttype,
-		//url: "http://127.0.0.1/api/"+resource, //local
-		url: "http://uoless.com/api/"+resource, //web
+		url: "http://127.0.0.1/api/"+resource, //local
+		//url: "http://uoless.com/api/"+resource, //web
 		dataType: "json",
 		//data: {data: data},
 		data: data,
@@ -119,6 +119,16 @@ $(window).hashchange( function(){
 		} else if (hash == 'connections') {
 			contacts_get(true);
 		} else if (hash == 'logout') {
+			$.ajaxWrapper(
+				'logout', //resource
+				'POST', //type
+				true, //secure
+				{}, //data,
+				false, //notification
+				{} //ajax options
+			);
+
+			//Clear local credentials independent of success of logout
 			Object.keys(localStorage).forEach(function(key){
 				if (/^user_/.test(key)) localStorage.removeItem(key); //kill all localstorage items starting with user_
 			});
