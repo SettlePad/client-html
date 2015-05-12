@@ -34,7 +34,7 @@
 				success: function(data){
 					var compiledTemplate = Handlebars.getTemplate('balance_currency');
 					if (data.data.connections !== undefined) {
-						$("#content").html(compiledTemplate({selected_currency: balance_format(data.data.summary), connections: balance_format(data.data.connections.sort(balance_sort)), multiple_currencies: multiple_currencies}));
+						$("#content").html(compiledTemplate({selected_currency: balance_format(data.data.summary[currency]), connections: balance_format(data.data.connections[currency].sort(balance_sort)), multiple_currencies: multiple_currencies}));
 					} else {
 						$("#content").html(compiledTemplate);
 					}
@@ -522,6 +522,8 @@
 		//Interpret 0 as NULL for limit and favorite, '' as NULL for name
 
 		can_submit = false;
+
+		//TODO: auto_limit implementation is outdated. Fix it!
 
 		if (field == 'limit') {
 			db_field = 'auto_limit';
