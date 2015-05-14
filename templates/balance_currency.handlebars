@@ -4,8 +4,8 @@
       <thead>
         <tr>
         <th></th>
-        <th class="text_right">You owe<br><small class="text-muted">{{selected_currency.currency}}</small></th>
-        <th class="text_right">You get<br><small class="text-muted">{{selected_currency.currency}}</small></th>
+        <th class="text_right">You owe<br><small class="text-muted">{{selected_currency}}</small></th>
+        <th class="text_right">You get<br><small class="text-muted">{{selected_currency}}</small></th>
         <!--<th class="text_right">Balance</th>-->
         </tr>
       </thead>
@@ -20,15 +20,15 @@
         {{/each}}
         <tr class="active text_bold">
           <td>Sum</td>
-          <td class="text_right"><span class="text-danger">{{#if selected_currency.owe_active}}{{selected_currency.owe_formatted}}{{/if}}</span></td>
-          <td class="text_right"><span class="text-success">{{#if selected_currency.get_active}}{{selected_currency.get_formatted}}{{/if}}</span></td>
-          <!-- <td class="text_right"><span class="text-{{#if selected_currency.balance_negative}}danger{{else}}success{{/if}}">{{selected_currency.balance_formatted}}</span></td> -->
+          <td class="text_right"><span class="text-danger">{{#if balaces.owe_active}}{{balaces.owe_formatted}}{{/if}}</span></td>
+          <td class="text_right"><span class="text-success">{{#if balaces.get_active}}{{balaces.get_formatted}}{{/if}}</span></td>
+          <!-- <td class="text_right"><span class="text-{{#if balaces.balance_negative}}danger{{else}}success{{/if}}">{{balaces.balance_formatted}}</span></td> -->
         </tr>
         <tr class="text_bold">
           <td>Balance</td>
-          <td class="text_right"><span class="text-danger">{{#if selected_currency.balance_negative}}{{selected_currency.balance_formatted}}{{/if}}</span></td>
-          <td class="text_right"><span class="text-success">{{#unless selected_currency.balance_negative}}{{selected_currency.balance_formatted}}{{/unless}}</span></td>
-          <!-- <td class="text_right"><span class="text-{{#if selected_currency.balance_negative}}danger{{else}}success{{/if}}">{{selected_currency.balance_formatted}}</span></td> -->
+          <td class="text_right"><span class="text-danger">{{#if balaces.balance_negative}}{{balaces.balance_formatted}}{{/if}}</span></td>
+          <td class="text_right"><span class="text-success">{{#unless balaces.balance_negative}}{{balaces.balance_formatted}}{{/unless}}</span></td>
+          <!-- <td class="text_right"><span class="text-{{#if balaces.balance_negative}}danger{{else}}success{{/if}}">{{balaces.balance_formatted}}</span></td> -->
         </tr>
       </tbody>
      </table>
