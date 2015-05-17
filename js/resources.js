@@ -1,3 +1,7 @@
+//TODO: implement limits
+//TODO: implement registration
+//TODO: implement forgot my password
+
 //Balance
 	var multiple_currencies = true; //becomes true if balance_currencies is called, so that a back link can be shown to the currency overview page
 	function balance_currencies() {
@@ -578,6 +582,24 @@
 
 		if (can_submit) contacts_post(id, db_field, value);
 	}
+
+//Validate email address
+function validate_email(email,user_id,token) {
+	$.ajaxWrapper(
+		'register/verify/', //resource
+		'POST', //type
+		false, //secure
+		{identifier: email, user_id: user_id, token: token}, //data,
+		true, //notification
+		{
+			success: function(data){
+				$.bootstrapGrowl('Email address validated. Now please login', {'delay':2000, 'type':'success'});
+				document.location.hash = 'reset';
+				$(window).hashchange();
+			}
+		} //ajax options
+	);
+}
 
 //Local contacts database (only UOless contacts in webversion)
 	var contacts = []; //array of objects

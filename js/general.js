@@ -65,7 +65,7 @@ jQuery.ajaxWrapper = function(resource, type, secure, data, notification, ajaxOp
 //Bind an event to window.onhashchange that, when the hash changes, gets the hash and adds the class "selected" to any matching nav link.
 $(window).hashchange( function(){
 	var hash = location.hash.slice(1);
-	var hash_split = hash.split("_");
+	var hash_split = hash.split("/");
 
 	menu_item = hash_split[0];
 	if (menu_item =='connections' || menu_item == 'profile') menu_item = 'settings';
@@ -86,9 +86,10 @@ $(window).hashchange( function(){
 		document.location.hash = '';
 	}
 
+	if (hash_split[0] == 'validate') validate_email(hash_split[2],hash_split[1],hash_split[3]);
 
-	//Check whether logged in
 	if (localStorage.getItem('user_id') === null) {
+		//Not logged in
 		if (hash_split[0] == 'test') {
 			$('#loginEmail').val("pete@mailinator.com");
 			$('#loginPassword').val("aa");
@@ -100,6 +101,7 @@ $(window).hashchange( function(){
 		$('#username_left').html("");
 		$('#loginModal').modal({keyboard: false, backdrop: 'static'});
 	} else {
+		//Logged in
 		$('#username_top').html(localStorage.getItem('user_name'));
 		$('#username_left').html(localStorage.getItem('user_name'));
 		contacts_get_if_needed(); //Check whether contacts should be obtained, and if so, do so
