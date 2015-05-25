@@ -86,7 +86,7 @@ $(window).hashchange( function(){
 		document.location.hash = '';
 	}
 
-	if (hash_split[0] == 'validate') validate_email(hash_split[2],hash_split[1],hash_split[3]);
+	if (hash_split[0] == 'validate') validate_email(hash_split[1],hash_split[2]);
 
 	if (localStorage.getItem('user_id') === null) {
 		//Not logged in

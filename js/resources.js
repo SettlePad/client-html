@@ -1,6 +1,6 @@
 //TODO: implement limits
 //TODO: implement registration
-//TODO: implement forgot my password
+//TODO: implement forgot my password (/#reset/email/token)
 
 //Balance
 	var multiple_currencies = true; //becomes true if balance_currencies is called, so that a back link can be shown to the currency overview page
@@ -584,12 +584,12 @@
 	}
 
 //Validate email address
-function validate_email(email,user_id,token) {
+function validate_email(email,token) {
 	$.ajaxWrapper(
 		'register/verify/', //resource
 		'POST', //type
 		false, //secure
-		{identifier: email, user_id: user_id, token: token}, //data,
+		{identifier: email, token: token}, //data,
 		true, //notification
 		{
 			success: function(data){
