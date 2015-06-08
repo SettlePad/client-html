@@ -18,10 +18,11 @@ body {
 
 .logo {
 	margin-bottom: 20px;
-  background-image: url(../img/s243w.png);
-	background-size: 243px 37px;
-	height: 37px;
-	width: 243px;
+  background-image: url(../img/s200w.png);
+	background-size: 200px 30px;
+	height: 30px;
+	width: 200px;
+	margin-left: 14px;
 }
 
 .logo-small {
@@ -31,20 +32,21 @@ body {
 	width: 135px;
 }
 
+
 /* for high resolution display */
 @media only screen and (min--moz-device-pixel-ratio: 2),
 only screen and (-o-min-device-pixel-ratio: 2/1),
 only screen and (-webkit-min-device-pixel-ratio: 2),
 only screen and (min-device-pixel-ratio: 2) {
 	.logo {
-		background: url(../img/s243w@2x.png) no-repeat;
-		background-size: 243px 37px;
+		background: url(../img/s200w@2x.png) no-repeat;
+		background-size: 200px 30px;
 	}
 
 	.logo-small {
 		background: url(../img/s20h@2x.png) no-repeat;
 		background-size: 135px 20px;
-	}	
+	}
 }
 
 .bootstrap-growl {
