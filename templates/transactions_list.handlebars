@@ -1,5 +1,5 @@
 {{#each transactions}}
-  <span onclick="transaction_toggle(this);" class="list-group-item transactions_block" id="transaction_{{transaction_id}}">
+  <span onclick="transaction_toggle(this);" class="list-group-item cursor_pointer" id="transaction_{{transaction_id}}">
     <span class="transactions_amount text-{{#if status_canceled}}muted{{else}}{{#if amount_negative}}danger{{else}}success{{/if}}{{/if}}">{{#if status_canceled}}<s>{{/if}}{{currency}} {{amount_formatted}}{{#if status_canceled}}</s>{{/if}}</span>
     <h5 class="list-group-item-heading">{{#if status_canceled}}<s>{{/if}}{{description}}{{#if status_canceled}}</s>{{/if}} {{#if status_canceled}}<span class="label label-default">canceled</span>{{else}}{{#if status_pending}}<span class="label label-warning">not yet approved</span>{{else}}{{#unless reduced}} <span class="label label-info">processing</span> {{/unless}}{{/if}}{{/if}}</h5>
     <div class="transaction_anti_toggle">

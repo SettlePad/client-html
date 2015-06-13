@@ -284,7 +284,7 @@
 		);
 	}
 
-//Send IOU or UOMe
+//Send memo
 	function send_load(){
 		var compiledTemplate = Handlebars.getTemplate('send_memo');
 		$("#content").html(compiledTemplate({}));
@@ -355,12 +355,12 @@
 	  };
 	};
 
-	var send_list = []; //array of UOMe/IOU's
+	var send_list = []; //array of memos
 	var send_list_id = 0;
 
 	function send_add(){
 		if (send_check()) {
-			if ($('#send_form input[type=radio]:checked').val() == 'iou') {
+			if ($('#send_form input[type=radio]:checked').val() == 'owe') {
 				amount = -1*parseFloat($('#sendform_amount').val());
 			} else {
 				amount = parseFloat($('#sendform_amount').val());
@@ -407,7 +407,7 @@
 
 		if (can_send) {
 			$.ajaxWrapper(
-				'uome/send/', //resource
+				'memo/send/', //resource
 				'POST', //type
 				true, //secure
 				send_list, //data,
@@ -418,10 +418,10 @@
 							document.location.hash = 'transactions';
 
 							//reset send list
-							send_list = []; //array of UOMe/IOU's
+							send_list = []; //array of memos
 							send_list_id = 0;
 
-							$.bootstrapGrowl('UOme sent. Not right? You can cancel them for 5 minutes (not yet implemented).', {'delay':2000, 'type':'success'});
+							$.bootstrapGrowl('Memo sent. Not right? You can cancel them for 5 minutes (not yet implemented).', {'delay':2000, 'type':'success'});
 						}
 
 					}
@@ -685,6 +685,19 @@
 		}
 
 		if (can_submit) contacts_post(id, db_field, value);
+	}
+
+//Connection
+	function connection_load(id) {
+		var compiledTemplate = Handlebars.getTemplate('connection');
+		$.each(contacts, function(i, contact) {
+			if (contact.id == id) {
+				connection = contact;
+			}
+		});
+		if (connection != null) {
+			$("#content").html(compiledTemplate({connection: connection}));
+		}
 	}
 
 //Validate email address

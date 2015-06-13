@@ -23,7 +23,17 @@
 	text-align: center;
 }
 
-.transactions_block {
+.connections_star {
+	float: right;
+	display: inline-block;
+	min-width: 10px;
+	padding: 3px 7px;
+	vertical-align: baseline;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.cursor_pointer {
 	cursor: pointer;
 }
 

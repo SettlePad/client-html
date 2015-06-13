@@ -114,6 +114,8 @@ $(window).hashchange( function(){
 			settings();
 		} else if (hash == 'connections') {
 			contacts_get(true);
+		} else if (hash_split[0] == 'connection'){
+			connection_load(hash_split[1]);
 		} else if (hash == 'logout') {
 			$.ajaxWrapper(
 				'logout', //resource
