@@ -1,2 +1,2 @@
 # client-html
-Web client for UOless
+Web client for SettlePad

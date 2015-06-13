@@ -7,7 +7,7 @@
 	function balance_currencies() {
 		var currencies;
 		$.ajaxWrapper(
-			'balance/', //resource
+			'balance', //resource
 			'GET', //type
 			true, //secure
 			{}, //data,
@@ -299,7 +299,7 @@
 			$('#sendform_to').typeahead(null, {
 			  name: 'contacts',
 			  displayKey: 'identifier',
-			  source: substringMatcher(),
+			  source: substringContactsMatcher(),
 			  templates: {
 			    suggestion: Handlebars.compile('<p><strong>{{name}}</strong> &lt;{{identifier}}&gt;</p>')
 			  }
@@ -330,7 +330,7 @@
 	}
 
 	//Typeahead for recipients
-	var substringMatcher = function() {
+	var substringContactsMatcher = function() {
 	  return function findMatches(q, cb) {
 	    var matches, substrRegex;
 
@@ -482,6 +482,110 @@
 		return result;
 	}
 
+//Settings
+	function settings(){
+		var compiledTemplate = Handlebars.getTemplate('settings');
+		identifiers = $.parseJSON(localStorage.getItem('user_identifiers'));
+		if (identifiers == null) {
+			login_credentials_count = 0;
+		} else {
+			login_credentials_count = identifiers.length;
+		}
+
+		favorites = jQuery.grep(contacts, function( contact, index ) {
+  		return ( contact.favorite == 1 );
+		});
+		if (favorites == null) {
+			favorite_count = 0;
+		} else {
+			favorite_count = favorites.length;
+		}
+
+		if (limits == null) {
+			limit_count = 0;
+		} else {
+			limit_count = Object.keys(limits).length;
+		}
+
+		currency_key = localStorage.getItem('user_default_currency');
+		$("#content").html(compiledTemplate({name: localStorage.getItem('user_name'), login_credentials: login_credentials_count, login_credentials_multiple: login_credentials_count != 1, default_currency: currency_key, favorites: favorite_count, favorites_multiple: favorite_count != 1, limits: limit_count, limits_multiple: limit_count != 1}));
+
+		$("#settings_name").change(function(e) {
+			settings_post('name', e.target.value, true);
+		});
+
+		$("#settings_default_currency").change(function(e) {
+			settings_post('default_currency', e.target.value, true);
+		});
+
+		$('#settings_default_currency').typeahead(null, {
+			displayKey: 'key',
+			source: substringCurrencyMatcher(),
+			templates: {
+				suggestion: Handlebars.compile('<p><strong>{{value}}</strong> ({{key}})</p>')
+			}
+		});
+
+		$('#settings_default_currency').bind('typeahead:selected', function(evt,suggestion,dataset){
+			settings_post('default_currency', suggestion.key, true);
+		});
+	}
+
+	//Typeahead for currencies
+	var substringCurrencyMatcher = function() {
+	  return function findMatches(q, cb) {
+	    var matches, substrRegex;
+
+	    // an array that will be populated with substring matches
+	    matches = [];
+
+	    // regex used to determine if a string contains the substring `q`
+	    substrRegex = new RegExp(escapeRegExp(q), 'i');
+
+	    // iterate through the pool of strings and for any string that
+	    // contains the substring `q`, add it to the `matches` array
+			$.each(currencies, function(key, value) {
+      	if (substrRegex.test(value) || substrRegex.test(key)) {
+        	// the typeahead jQuery plugin expects suggestions to a
+        	// JavaScript object, refer to typeahead docs for more info
+        	matches.push({ key: key, value: value});
+      	}
+    	});
+
+	    cb(matches);
+	  };
+	};
+
+	function settings_post(field, value, propagate) {
+		//Update local database
+		oldValue = localStorage.getItem('user_'+field, value);
+		localStorage.setItem('user_'+field, value);
+
+		payload = {};
+		payload[field] = value;
+
+		if (propagate) {
+			//Propagate to API
+			$.ajaxWrapper(
+				'settings/', //resource
+				'POST', //type
+				true, //secure
+				payload, //data,
+				false, //notification
+				{
+					error: function(xhr, errorType, exception) {
+						//revert
+						settings_post(field,oldValue,false);
+						settings();
+					},
+					success: function(data){
+						$.bootstrapGrowl('Saved', {'delay':2000, 'type':'success'});
+					}
+				} //ajax options
+			);
+		}
+	}
+
 //Connections
 	function connections_load() {
 		var compiledTemplate = Handlebars.getTemplate('connections');
@@ -584,30 +688,33 @@
 	}
 
 //Validate email address
-function validate_email(email,token) {
-	$.ajaxWrapper(
-		'register/verify/', //resource
-		'POST', //type
-		false, //secure
-		{identifier: email, token: token}, //data,
-		true, //notification
-		{
-			success: function(data){
-				$.bootstrapGrowl('Email address validated. Now please login', {'delay':2000, 'type':'success'});
-				document.location.hash = 'reset';
-				$(window).hashchange();
-			}
-		} //ajax options
-	);
-}
+	function validate_email(email,token) {
+		$.ajaxWrapper(
+			'register/verify/', //resource
+			'POST', //type
+			false, //secure
+			{identifier: email, token: token}, //data,
+			true, //notification
+			{
+				success: function(data){
+					$.bootstrapGrowl('Email address validated. Now please login', {'delay':2000, 'type':'success'});
+					document.location.hash = 'reset';
+					$(window).hashchange();
+				}
+			} //ajax options
+		);
+	}
 
-//Local contacts database (only UOless contacts in webversion)
+//Local contacts database (only API-contacts in webversion)
 	var contacts = []; //array of objects
 	var contacts_loaded = false;
 
 	function contacts_get(show_connections) {
+		//Load contacts first and limits afterwards
+		localStorage.setItem('user_contacts_last_update', moment().unix());
+
 		$.ajaxWrapper(
-			'contacts/', //resource
+			'contacts', //resource
 			'GET', //type
 			true, //secure
 			{}, //data,
@@ -615,14 +722,28 @@ function validate_email(email,token) {
 			{
 				success: function(data){
 					contacts = data.data;
-					contacts_loaded = true;
 					localStorage.setItem('user_contacts', JSON.stringify(contacts));
-					localStorage.setItem('user_contacts_last_update', moment().unix());
-					if(show_connections) connections_load();
+					$.ajaxWrapper(
+						'autolimits', //resource
+						'GET', //type
+						true, //secure
+						{}, //data,
+						false, //notification
+						{
+							success: function(data){
+								limits = data.data;
+								contacts_loaded = true;
+								localStorage.setItem('user_limits', JSON.stringify(limits));
+								if(show_connections) connections_load();
+							}
+						} //ajax options
+					);
+
 				}
 			} //ajax options
 		);
 	}
+
 
 	function contacts_get_if_needed(){
 		if (localStorage.getItem('user_contacts_last_update') === null || Number(localStorage.getItem('user_contacts_last_update')) < (moment().unix() - 60*60*24)) {
@@ -631,6 +752,7 @@ function validate_email(email,token) {
 		} else if(!contacts_loaded) {
 			//put in contacts var
 			contacts = $.parseJSON(localStorage.getItem('user_contacts'));
+ 			limits = $.parseJSON(localStorage.getItem('user_limits'));
 			contacts_loaded = true;
 		}
 	}

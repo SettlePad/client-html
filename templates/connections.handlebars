@@ -1,7 +1,7 @@
-<ul class="nav nav-tabs" role="tablist">
-  <li><a href="#profile">Profile</a></li>
-  <li class="active"><a href="#connections">Connections</a></li>
-</ul>
+<ol class="breadcrumb">
+  <li><a href="#settings">Settings</a></li>
+  <li class="active">Connections</li>
+</ol>
 
 {{#if connections}}
   <div class="table-responsive">
@@ -11,7 +11,7 @@
   		<th></th>
   		<th>Friendly name</th>
   		<th class="text-nowrap">Auto accept UOMes <a href="javascript:void(0);" tabindex="0" id="connections_popover_auto_accept" data-toggle="popover" data-trigger="focus" title="Auto accept UOMes" data-content="Automatically accept UOMes you receive from a specific connection, up to the specified limit. If activated, IOUs you receive from this connection in your primary currency will always be accepted automatically." data-container="body"  data-placement="bottom"><span class="glyphicon glyphicon-info-sign"></span></a></th>
-  		<th class="text-nowrap">Favorite debtor <a href="javascript:void(0);" tabindex="0" id="connections_popover_favorite_debtor" data-toggle="popover" data-trigger="focus" title="Favorite debtor" data-content="UOless allocates as much as possible of the receivables to your starred connections. So now you can pay beer for friend A (who is a lousy debtor to you) and instead, get it back from starred friend B." data-container="body" data-placement="bottom"><span class="glyphicon glyphicon-info-sign"></span></a></th>
+  		<th class="text-nowrap">Favorite debtor <a href="javascript:void(0);" tabindex="0" id="connections_popover_favorite_debtor" data-toggle="popover" data-trigger="focus" title="Favorite debtor" data-content="SettePad allocates as much as possible of the receivables to your starred connections. So now you can pay beer for friend A (who is a lousy debtor to you) and instead, get it back from starred friend B." data-container="body" data-placement="bottom"><span class="glyphicon glyphicon-info-sign"></span></a></th>
   	  </tr>
   	</thead>
   	<tbody>
