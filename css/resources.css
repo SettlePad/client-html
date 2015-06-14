@@ -23,7 +23,7 @@
 	text-align: center;
 }
 
-.connections_star {
+.right-in-list-group {
 	float: right;
 	display: inline-block;
 	min-width: 10px;
@@ -31,6 +31,10 @@
 	vertical-align: baseline;
 	white-space: nowrap;
 	text-align: center;
+}
+
+.icon_size {
+	font-size: 24px;
 }
 
 .cursor_pointer {
@@ -91,9 +95,6 @@
 	fieldset { display: table-cell; }
 }
 
-.connections_star {
-	font-size: 24px;
-}
 .connections_yellow {
 	color: #FFC517;
 }

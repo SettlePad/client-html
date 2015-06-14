@@ -7,16 +7,23 @@
   <div class="list-group">
     {{#each connections}}
       <a href="#connection/{{id}}" class="list-group-item">
-        <span class="connections_star">
-          <span class="glyphicon {{#if favorite}}glyphicon-star connections_yellow{{else}}glyphicon-star-empty text-muted{{/if}} connections_star"></span>
-        </span>
-
-        <h5 class="list-group-item-heading">
-          {{name}}
-        </h5>
-        {{#each identifiers}}
-            {{#if active}}<p class="list-group-item-text">{{identifier}}</p>{{/if}}
-        {{/each}}
+        <div class="row">
+          <div class="col-xs-9">
+            <h5 class="list-group-item-heading">
+              {{#if friendly_name}}{{friendly_name}}{{else}}{{name}}{{/if}}
+            </h5>
+            {{#each identifiers}}
+              {{#if active}}<p class="list-group-item-text">{{identifier}}</p>{{/if}}
+            {{/each}}
+          </div>
+          <div class="col-xs-3">
+            <p class="text-right">
+              {{#if limits}}<span class="glyphicon glyphicon-transfer text-muted icon_size"></span>{{/if}}
+              {{#if favorite}}<span class="glyphicon glyphicon-star connections_yellow icon_size"></span>{{/if}}
+            </p>
+          </div>
+        </div>
+        <!-- TODO: add limit information -->
       </a>
     {{/each}}
   </div>

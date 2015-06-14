@@ -492,14 +492,13 @@
 			login_credentials_count = identifiers.length;
 		}
 
-		favorites = jQuery.grep(contacts, function( contact, index ) {
-  		return ( contact.favorite == 1 );
+
+		favorite_count = 0;
+		$.each(contacts, function(key, contact) {
+			if (contact.favorite == 1) {
+				favorite_count++;
+			}
 		});
-		if (favorites == null) {
-			favorite_count = 0;
-		} else {
-			favorite_count = favorites.length;
-		}
 
 		if (limits == null) {
 			limit_count = 0;
@@ -590,6 +589,8 @@
 	function connections_load() {
 		var compiledTemplate = Handlebars.getTemplate('connections');
 		$("#content").html(compiledTemplate({connections: contacts}));
+
+		//TODO: delete below
 		$('#connections_popover_auto_accept').popover();
 		$('#connections_popover_favorite_debtor').popover();
 
@@ -618,14 +619,23 @@
 			id = e.target.id.split('_')[2];
 			connections_submit(id, 'limit');
 		});
+	}
 
-		$("input[id^='connection_name_']").change(function(e) {
-			id = e.target.id.split('_')[2];
-			connections_submit(id, 'name');
+//Connection
+	function connection_load(id) {
+		var compiledTemplate = Handlebars.getTemplate('connection');
+		if (id in contacts) {
+			$("#content").html(compiledTemplate({connection: contacts[id]}));
+		} else {
+			$("#content").html(compiledTemplate());
+		}
+
+		$("#connection_name").change(function(e) {
+			connection_submit(id, 'name');
 		});
 	}
 
-	function connections_submit(id, field) {
+	function connection_submit(id, field) {
 		//Three fields: limit (non-neg float), favorite (0 or 1) and name (string)
 		//Interpret 0 as NULL for limit and favorite, '' as NULL for name
 
@@ -655,50 +665,39 @@
 		} else if (field == 'name') {
 			db_field = 'friendly_name';
 			can_submit = true;
-			if ($('#connection_name_'+id).val() == ''){
+			if ($('#connection_name').val() == ''){
 				value = null;
 			} else {
-				value = $('#connection_name_'+id).val();
+				value = $('#connection_name').val();
 			}
-			$('#connection_name_'+id).parent().addClass('has-success');
+			$('#connection_name').parent().addClass('has-success');
 			setTimeout(function() {
-				$('#connection_name_'+id).parent().removeClass('has-success');
+				$('#connection_name').parent().removeClass('has-success');
 			}, 1000);
 		}  else if (field == 'favorite') {
 			db_field = 'favorite';
 			can_submit = true;
-			if ($('#connection_favorite_'+id).hasClass('glyphicon-star-empty')) {
+			if ($('#connection_favorite').hasClass('glyphicon-star-empty')) {
 				//to become a favorite
-				$('#connection_favorite_'+id).removeClass('glyphicon-star-empty');
-				$('#connection_favorite_'+id).removeClass('text-muted');
-				$('#connection_favorite_'+id).addClass('glyphicon-star');
-				$('#connection_favorite_'+id).addClass('connections_yellow');
+				$('#connection_favorite').removeClass('glyphicon-star-empty');
+				$('#connection_favorite').removeClass('text-muted');
+				$('#connection_favorite').addClass('glyphicon-star');
+				$('#connection_favorite').addClass('connections_yellow');
 				value = 1;
 			} else {
 				//to become a non-favorite
-				$('#connection_favorite_'+id).addClass('glyphicon-star-empty');
-				$('#connection_favorite_'+id).addClass('text-muted');
-				$('#connection_favorite_'+id).removeClass('glyphicon-star');
-				$('#connection_favorite_'+id).removeClass('connections_yellow');
+				$('#connection_favorite').addClass('glyphicon-star-empty');
+				$('#connection_favorite').addClass('text-muted');
+				$('#connection_favorite').removeClass('glyphicon-star');
+				$('#connection_favorite').removeClass('connections_yellow');
 				value = null;
 			}
 		}
 
-		if (can_submit) contacts_post(id, db_field, value);
+		if (can_submit) contact_post(id, db_field, value);
 	}
 
-//Connection
-	function connection_load(id) {
-		var compiledTemplate = Handlebars.getTemplate('connection');
-		$.each(contacts, function(i, contact) {
-			if (contact.id == id) {
-				connection = contact;
-			}
-		});
-		if (connection != null) {
-			$("#content").html(compiledTemplate({connection: connection}));
-		}
-	}
+
 
 //Validate email address
 	function validate_email(email,token) {
@@ -719,8 +718,9 @@
 	}
 
 //Local contacts database (only API-contacts in webversion)
-	var contacts = []; //array of objects
+	var contacts = {}; //dict
 	var contacts_loaded = false;
+	var limits = {}; //dict
 
 	function contacts_get(show_connections) {
 		//Load contacts first and limits afterwards
@@ -735,7 +735,6 @@
 			{
 				success: function(data){
 					contacts = data.data;
-					localStorage.setItem('user_contacts', JSON.stringify(contacts));
 					$.ajaxWrapper(
 						'autolimits', //resource
 						'GET', //type
@@ -746,7 +745,9 @@
 							success: function(data){
 								limits = data.data;
 								contacts_loaded = true;
+								add_limits_to_contacts();
 								localStorage.setItem('user_limits', JSON.stringify(limits));
+								localStorage.setItem('user_contacts', JSON.stringify(contacts));
 								if(show_connections) connections_load();
 							}
 						} //ajax options
@@ -757,6 +758,14 @@
 		);
 	}
 
+	function add_limits_to_contacts() {
+		$.each(limits, function(key, limit) {
+			//try matching limits
+			if (key in contacts) {
+				contacts[key]['limits'] = limit;
+			}
+		});
+	}
 
 	function contacts_get_if_needed(){
 		if (localStorage.getItem('user_contacts_last_update') === null || Number(localStorage.getItem('user_contacts_last_update')) < (moment().unix() - 60*60*24)) {
@@ -770,7 +779,7 @@
 		}
 	}
 
-	function contacts_post(id, field, value) {
+	function contact_post(id, field, value) {
 		//Update local database
 		$.each(contacts, function(i, contact) {
 			if (contact.id == id) {

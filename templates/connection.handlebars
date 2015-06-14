@@ -1,10 +1,49 @@
 <ol class="breadcrumb">
   <li><a href="#settings">Settings</a></li>
   <li><a href="#connections">Connections</a></li>
-  <li class="active">{{connection.name}}</li>
+  <li class="active">{{#if connection.friendly_name}}{{connection.friendly_name}}{{else}}{{connection.name}}{{/if}}</li>
 </ol>
 
-{{#if connections}}
+{{#if connection}}
+  <form role="form" id="connection_form" class="form-horizontal">
+    <div class="form-group" id="connection_name_group">
+      <label class="col-sm-2 control-label" for="connection_name">Name</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" id="connection_name" placeholder="{{connection.name}}" value="{{connection.friendly_name}}">
+      </div>
+    </div>
+    <div class="form-group" id="connection_identifier_group">
+      <label class="col-sm-2 control-label">Email address(es)</label>
+      <div class="col-sm-8">
+        {{#each connection.identifiers}}
+          {{#if active}}
+            <p class="form-control-static">{{identifier}}</p>
+          {{else}}
+            <p class="form-control-static"><s>{{identifier}}</s></p>
+          {{/if}}
+        {{/each}}
+
+      </div>
+    </div>
+    <div class="form-group" id="connection_favorite_group">
+      <label class="col-sm-2 control-label" for="connection_favorite">Favorite</label>
+      <div class="col-sm-8">
+        <a href="javascript:connection_submit('{{connection.id}}','favorite');"><span id="connection_favorite" class="glyphicon {{#if connection.favorite}}glyphicon-star connections_yellow{{else}}glyphicon-star-empty text-muted{{/if}} icon_size"></span></a>
+        <p class="form-control-static text-muted small">SettePad allocates as much as possible of the receivables to your starred connections. So now you can pay beer for friend A (who is a lousy debtor to you) and instead, get it back from starred friend B.</p>
+      </div>
+    </div>
+    <div class="form-group" id="connection_limit_group">
+      <label class="col-sm-2 control-label" for="connection_limit">Auto accept limits</label>
+      <div class="col-sm-8" id="connection_limit">
+        {{#each connection.limits}}
+          <p class="form-control-static">{{@key}} {{this}}</p>
+        {{/each}}
+        <p class="form-control-static text-muted small">SettlePad will automatically accept incoming memos until the sum of the last 24 hours crosses the specified (positive) limit.</p>
+      </div>
+    </div>
+  </form>
+
+<!--
   <div class="table-responsive">
     <table class="table table-hover">
   	<thead>
@@ -43,18 +82,18 @@
       				</div>
       				<div class="form-group connections_formgroup">
       					<label class="sr-only" for="connection_limit_{{id}}">Limit</label>
-      					<input type="text" class="form-control connections_limit_inputbox" id="connection_limit_{{id}}" placeholder="Limit [EUR]" value="{{#if auto_limit}}{{auto_limit}}{{/if}}"> <!-- TODO: Dynamic currency -->
+      					<input type="text" class="form-control connections_limit_inputbox" id="connection_limit_{{id}}" placeholder="Limit [EUR]" value="{{#if auto_limit}}{{auto_limit}}{{/if}}">
       				</div>
       			</form>
       		</td>
       		<td>
-      			<a href="javascript:connections_submit('{{id}}','favorite');"><span id="connection_favorite_{{id}}" class="glyphicon {{#if favorite}}glyphicon-star connections_yellow{{else}}glyphicon-star-empty text-muted{{/if}} connections_star"></span></a>
       		</td>
     	  </tr>
       {{/each}}
   	</tbody>
     </table>
   </div>
+-->
 {{else}}
-  <p>You did not send or receive a UOMe yet.</p>
+  <p>The contact does not exist.</p>
 {{/if}}
