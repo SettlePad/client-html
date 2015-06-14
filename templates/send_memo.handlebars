@@ -7,7 +7,7 @@
       </div>
     </div>
   </div>
-  <div class="row">
+  <div class="row" id="sendform_amount_row">
     <div class="col-sm-8">
       <div class="form-group">
         <label class="control-label sr-only" for="sendform_amount">Amount</label>
@@ -19,23 +19,36 @@
             <input type="radio" name="sendform_direction" value="owe"> I owe
           </label>
         </div>
-        <div class="input-group memo_right " id="send_amount_group">
+        <div class="input-group" id="send_amount_group">
           <span class="input-group-btn">
-          	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span id="send_currency">EUR</span> <span class="caret"></span></button>
+          	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span id="send_currency">{{default_currency}}</span> <span class="caret"></span></button>
           	<ul class="dropdown-menu" role="menu">
           	  <li><a href="javascript:send_set_currency('USD');">USD</a></li>
           	  <li><a href="javascript:send_set_currency('GBP');">GBP</a></li>
           	  <li><a href="javascript:send_set_currency('EUR');">EUR</a></li>
           	  <li class="divider"></li>
-          	  <li><a href="javascript:send_set_currency('EUR');">Other (not implemented yet)</a></li> <!--TODO: fix -->
+          	  <li><a href="javascript:send_show_currency_form();">Other</a></li>
           	</ul>
           </span>
-
           <input type="text" class="form-control" id="sendform_amount" placeholder="Amount">
-        </div><!-- /input-group -->
+        </div>
       </div>
     </div>
   </div>
+
+  <div class="row hidden" id="sendform_currency_row">
+    <div class="col-sm-8">
+      <div class="form-group">
+        <div class="input-group" id="send_currency_group">
+          <input type="text" class="form-control" value="{{default_currency}}" id="sendform_currency" placeholder="Currency">
+          <span class="input-group-btn">
+            <a href="javascript:void(0);" onclick="send_parse_currency();" class="btn btn-primary" type="button">Set</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-sm-8">
       <div class="form-group" id="send_recipient_group">

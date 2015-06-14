@@ -60,10 +60,6 @@
 	margin-right: 10px;
 }
 
-.memo_right {
-	/*overflow: hidden*/
-}
-
 .memo_list_amount {
 	float: right;
 	display: inline-block;
@@ -87,10 +83,6 @@
 	text-align: center;
 }
 
-.nav-tabs { /* used in settings page*/
-	margin-bottom: 15px;
-}
-
 @-moz-document url-prefix() { /* hack for responsive tables in firefox, see bootstrap manual */
 	fieldset { display: table-cell; }
 }
@@ -98,19 +90,7 @@
 .connections_yellow {
 	color: #FFC517;
 }
-.form-inline .form-control.connections_limit_inputbox {
-	width:100px;
-}
-.form-inline .checkbox input[type="checkbox"].connections_limit_checkbox {
-	position: relative; /* does not work yet! */
-}
-.form-inline .form-control.connections_name {
-	width:150px;
-}
 
-.form-inline .form-group.connections_formgroup {
-	display: inline-block;
-}
-.form-inline .checkbox {
-	display: inline;
+.bottom15 {
+	margin-bottom: 15px;
 }

@@ -1,4 +1,3 @@
-//TODO: implement limits
 //TODO: implement registration
 //TODO: implement forgot my password (/#reset/email/token)
 
@@ -286,8 +285,10 @@
 
 //Send memo
 	function send_load(){
+		currency_key = localStorage.getItem('user_default_currency');
+
 		var compiledTemplate = Handlebars.getTemplate('send_memo');
-		$("#content").html(compiledTemplate({}));
+		$("#content").html(compiledTemplate({default_currency: currency_key}));
 
 		if (send_list.length > 0) {
 			var compiledTemplate = Handlebars.getTemplate('send_list');
@@ -323,10 +324,52 @@
 		$('#sendform_to').keydown(function() {
 			if (event.keyCode == 13) send_add();
 		});
+
+		$('#sendform_currency').typeahead(null, {
+			displayKey: 'key',
+			source: substringCurrencyMatcher(),
+			templates: {
+				suggestion: Handlebars.compile('<p><strong>{{value}}</strong> ({{key}})</p>')
+			}
+		});
+
+		$('#sendform_currency').bind('typeahead:selected', function(evt,suggestion,dataset){
+			send_parse_currency();
+		});
 	}
 
 	function send_set_currency(currency) {
 		$('#send_currency').html(currency);
+	}
+
+	function send_parse_currency() {
+		result = true;
+		if($('#sendform_currency').val() in currencies) {//should be non-empty
+			$('#send_currency_group').removeClass('has-error');
+		} else {
+			$('#send_currency_group').addClass('has-error');
+			result = false;
+		}
+		if (result) {
+			send_set_currency($('#sendform_currency').val());
+			send_show_currency_form();
+		}
+	}
+
+	function send_show_currency_form() {
+		if ($('#sendform_currency_row').hasClass('hidden')) {
+			$('#sendform_currency_row').removeClass('hidden');
+			$('#sendform_amount_row').addClass('hidden');
+			$('#send_add_button').addClass('hidden');
+			$('#send_send_button').addClass('hidden');
+			$('#sendform_currency').val('').focus();
+		} else {
+			$('#sendform_currency_row').addClass('hidden');
+			$('#sendform_amount_row').removeClass('hidden');
+			$('#send_add_button').removeClass('hidden');
+			$('#send_send_button').removeClass('hidden');
+			$('#sendform_amount').focus();
+		}
 	}
 
 	//Typeahead for recipients
@@ -494,11 +537,13 @@
 
 
 		favorite_count = 0;
-		$.each(contacts, function(key, contact) {
-			if (contact.favorite == 1) {
-				favorite_count++;
-			}
-		});
+		if (contacts != null) {
+			$.each(contacts, function(key, contact) {
+				if (contact.favorite == 1) {
+					favorite_count++;
+				}
+			});
+		}
 
 		if (limits == null) {
 			limit_count = 0;
@@ -530,30 +575,7 @@
 		});
 	}
 
-	//Typeahead for currencies
-	var substringCurrencyMatcher = function() {
-	  return function findMatches(q, cb) {
-	    var matches, substrRegex;
 
-	    // an array that will be populated with substring matches
-	    matches = [];
-
-	    // regex used to determine if a string contains the substring `q`
-	    substrRegex = new RegExp(escapeRegExp(q), 'i');
-
-	    // iterate through the pool of strings and for any string that
-	    // contains the substring `q`, add it to the `matches` array
-			$.each(currencies, function(key, value) {
-      	if (substrRegex.test(value) || substrRegex.test(key)) {
-        	// the typeahead jQuery plugin expects suggestions to a
-        	// JavaScript object, refer to typeahead docs for more info
-        	matches.push({ key: key, value: value});
-      	}
-    	});
-
-	    cb(matches);
-	  };
-	};
 
 	function settings_post(field, value, propagate) {
 		//Update local database
@@ -623,9 +645,11 @@
 
 //Connection
 	function connection_load(id) {
+		currency_key = localStorage.getItem('user_default_currency');
+
 		var compiledTemplate = Handlebars.getTemplate('connection');
 		if (id in contacts) {
-			$("#content").html(compiledTemplate({connection: contacts[id]}));
+			$("#content").html(compiledTemplate({connection: contacts[id],default_currency: currency_key}));
 		} else {
 			$("#content").html(compiledTemplate());
 		}
@@ -633,6 +657,48 @@
 		$("#connection_name").change(function(e) {
 			connection_submit(id, 'name');
 		});
+
+		$('#connection_currency_input').typeahead(null, {
+			displayKey: 'key',
+			source: substringCurrencyMatcher(),
+			templates: {
+				suggestion: Handlebars.compile('<p><strong>{{value}}</strong> ({{key}})</p>')
+			}
+		});
+
+		$('#connection_currency_input').bind('typeahead:selected', function(evt,suggestion,dataset){
+			connection_parse_currency();
+		});
+	}
+
+	function connection_set_currency(currency) {
+		$('#connection_currency').html(currency);
+	}
+
+	function connection_parse_currency() {
+		result = true;
+		if($('#connection_currency_input').val() in currencies) {//should be non-empty
+			$('#connection_limit_group').removeClass('has-error');
+		} else {
+			$('#connection_limit_group').addClass('has-error');
+			result = false;
+		}
+		if (result) {
+			connection_set_currency($('#connection_currency_input').val());
+			connection_show_currency_form();
+		}
+	}
+
+	function connection_show_currency_form() {
+		if ($('#connection_currency_group').hasClass('hidden')) {
+			$('#connection_currency_group').removeClass('hidden');
+			$('#connection_amount_group').addClass('hidden');
+			$('#connection_currency_input').val('').focus();
+		} else {
+			$('#connection_currency_group').addClass('hidden');
+			$('#connection_amount_group').removeClass('hidden');
+			$('#connection_amount').focus();
+		}
 	}
 
 	function connection_submit(id, field) {
@@ -644,27 +710,22 @@
 		//TODO: auto_limit implementation is outdated. Fix it!
 
 		if (field == 'limit') {
-			db_field = 'auto_limit';
-			$('#connection_limit_'+id).val($('#connection_limit_'+id).val().replace(',','.'));
+			$('#connection_amount').val($('#connection_amount').val().replace(',','.'));
 			var patt=/^\d+(\.\d\d?)?$/;
-			if (!patt.test($('#connection_limit_'+id).val()) && $('#connection_limit_'+id).val() != '') { //should be non-negamount
-				$('#connection_limit_'+id).parent().addClass('has-error');
+			if (!patt.test($('#connection_amount').val()) && $('#connection_amount').val() != '') { //should be non-negamount
+				$('#connection_amount').parent().addClass('has-error');
 			} else {
 				can_submit = true;
-				if ($('#connection_limit_'+id).val() == '') {
+				if ($('#connection_amount').val() == '') {
 					value = null;
 				} else {
-					value = $('#connection_limit_'+id).val();
+					value = $('#connection_amount').val();
 				}
-				$('#connection_limit_'+id).parent().removeClass('has-error');
-				$('#connection_limit_'+id).parent().addClass('has-success');
-				setTimeout(function() {
-					$('#connection_limit_'+id).parent().removeClass('has-success');
-				}, 1000);
+				$('#connection_amount').parent().removeClass('has-error');
+				limit_post(id, $('#connection_currency').html(), $('#connection_amount').val());
+				connection_load(id);
 			}
 		} else if (field == 'name') {
-			db_field = 'friendly_name';
-			can_submit = true;
 			if ($('#connection_name').val() == ''){
 				value = null;
 			} else {
@@ -674,9 +735,8 @@
 			setTimeout(function() {
 				$('#connection_name').parent().removeClass('has-success');
 			}, 1000);
+			contact_post(id, 'friendly_name', value);
 		}  else if (field == 'favorite') {
-			db_field = 'favorite';
-			can_submit = true;
 			if ($('#connection_favorite').hasClass('glyphicon-star-empty')) {
 				//to become a favorite
 				$('#connection_favorite').removeClass('glyphicon-star-empty');
@@ -692,12 +752,15 @@
 				$('#connection_favorite').removeClass('connections_yellow');
 				value = null;
 			}
+			contact_post(id, 'favorite', value);
 		}
 
-		if (can_submit) contact_post(id, db_field, value);
 	}
 
-
+	function connection_remove_limit(id,currency) {
+		limit_post(id, currency, 0);
+		connection_load(id);
+	}
 
 //Validate email address
 	function validate_email(email,token) {
@@ -743,11 +806,9 @@
 						false, //notification
 						{
 							success: function(data){
-								limits = data.data;
+								if (data.data != '') limits = data.data;
 								contacts_loaded = true;
 								add_limits_to_contacts();
-								localStorage.setItem('user_limits', JSON.stringify(limits));
-								localStorage.setItem('user_contacts', JSON.stringify(contacts));
 								if(show_connections) connections_load();
 							}
 						} //ajax options
@@ -759,12 +820,26 @@
 	}
 
 	function add_limits_to_contacts() {
-		$.each(limits, function(key, limit) {
-			//try matching limits
-			if (key in contacts) {
-				contacts[key]['limits'] = limit;
+		if (contacts != null) {
+			//clean current limits
+			$.each(contacts, function(key, contact) {
+				contacts[key]['limits'] = null;
+			});
+
+			//add new
+			if (limits != null) {
+				$.each(limits, function(id, connection_limits) {
+					if (id in contacts) {
+						contacts[id]['limits'] = {};
+						$.each(connection_limits, function(currency, limit) {
+							contacts[id]['limits'][currency] = number_format(limit,2,true);
+						});
+					}
+				});
+				localStorage.setItem('user_limits', JSON.stringify(limits));
 			}
-		});
+			localStorage.setItem('user_contacts', JSON.stringify(contacts));
+		}
 	}
 
 	function contacts_get_if_needed(){
@@ -781,12 +856,10 @@
 
 	function contact_post(id, field, value) {
 		//Update local database
-		$.each(contacts, function(i, contact) {
-			if (contact.id == id) {
-				contacts[i][field] = value;
-			}
-		});
-		localStorage.setItem('user_contacts', JSON.stringify(contacts));
+		if (id in contacts) {
+			contacts[id][field] = value;
+			localStorage.setItem('user_contacts', JSON.stringify(contacts));
+		}
 
 		//Propagate to API
 		$.ajaxWrapper(
@@ -794,6 +867,31 @@
 			'POST', //type
 			true, //secure
 			{field: field, value: value}, //data,
+			false, //notification
+			{
+			} //ajax options
+		);
+	}
+
+	function limit_post(contact_id, currency, value) {
+		//Update local database
+		if (limits == null) limits = {};
+		if (!(contact_id in limits)) limits[contact_id] = {};
+
+		if (value > 0) {
+			limits[contact_id][currency] = value;
+		} else {;
+			delete limits[contact_id][currency];
+			value = 0;
+		}
+		add_limits_to_contacts();
+
+		//Propagate to API
+		$.ajaxWrapper(
+			'autolimits/'+contact_id+'/'+currency, //resource
+			'POST', //type
+			true, //secure
+			{auto_limit: value}, //data,
 			false, //notification
 			{
 			} //ajax options
@@ -829,3 +927,28 @@
 	function escapeRegExp(str) {
   	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 	}
+
+	//Typeahead for currencies
+	var substringCurrencyMatcher = function() {
+		return function findMatches(q, cb) {
+			var matches, substrRegex;
+
+			// an array that will be populated with substring matches
+			matches = [];
+
+			// regex used to determine if a string contains the substring `q`
+			substrRegex = new RegExp(escapeRegExp(q), 'i');
+
+			// iterate through the pool of strings and for any string that
+			// contains the substring `q`, add it to the `matches` array
+			$.each(currencies, function(key, value) {
+				if (substrRegex.test(value) || substrRegex.test(key)) {
+					// the typeahead jQuery plugin expects suggestions to a
+					// JavaScript object, refer to typeahead docs for more info
+					matches.push({ key: key, value: value});
+				}
+			});
+
+			cb(matches);
+		};
+	};

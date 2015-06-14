@@ -1,0 +1,44 @@
+<ol class="breadcrumb">
+  <li><a href="#settings">Settings</a></li>
+  <li class="active">Identifiers</li>
+</ol>
+
+<form role="form">
+  <div class="form-group" id="settings_name_group">
+    <label class="control-label sr-only" for="settings_name">Name</label>
+    <div class="input-group">
+      <span class="input-group-btn">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span id="connection_currency">{{default_currency}}</span> <span class="caret"></span></button>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href="javascript:connection_set_currency('USD');">USD</a></li>
+          <li><a href="javascript:connection_set_currency('GBP');">GBP</a></li>
+          <li><a href="javascript:connection_set_currency('EUR');">EUR</a></li>
+          <li class="divider"></li>
+          <li><a href="javascript:connection_show_currency_form();">Other</a></li>
+        </ul>
+      </span>
+      <input type="text" class="form-control" id="connection_amount" placeholder="Limit">
+      <span class="input-group-btn">
+        <a href="javascript:void(0);" onclick="connection_submit('{{connection.id}}','limit');" class="btn btn-primary" type="button">Add</a>
+      </span>
+    </div>
+  </div>
+</form>
+
+
+{{#if identifiers}}
+  <ul class="list-group">
+    {{#each identifiers}}
+      <li class="list-group-item">
+        <div class="row">
+          <div class="col-xs-9">
+            {{@key}} {{this}}
+          </div>
+          <div class="col-xs-3 text-right">
+            <a href="javascript:remove('{{../connection.id}}','{{@key}}');"><span class="glyphicon glyphicon-remove text-muted"></span></a>
+          </div>
+        </div>
+      </li>
+    {{/each}}
+  </ul>
+{{/if}}
