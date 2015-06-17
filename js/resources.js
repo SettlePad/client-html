@@ -1,5 +1,4 @@
 //TODO: implement registration
-//TODO: implement forgot my password (/#reset/email/token)
 
 //Balance
 	var multiple_currencies = true; //becomes true if balance_currencies is called, so that a back link can be shown to the currency overview page
@@ -464,7 +463,7 @@
 							send_list = []; //array of memos
 							send_list_id = 0;
 
-							$.bootstrapGrowl('Memo sent. Not right? You can cancel them for 5 minutes (not yet implemented).', {'delay':2000, 'type':'success'});
+							$.bootstrapGrowl('Memo sent. Not right? You can cancel them for 5 minutes.', {'delay':2000, 'type':'success'});
 						}
 
 					}
@@ -611,36 +610,6 @@
 	function connections_load() {
 		var compiledTemplate = Handlebars.getTemplate('connections');
 		$("#content").html(compiledTemplate({connections: contacts}));
-
-		//TODO: delete below
-		$('#connections_popover_auto_accept').popover();
-		$('#connections_popover_favorite_debtor').popover();
-
-		$("input[id^='connection_auto_accept_']").click(function(e) {
-			//if checked, set default limit and focus on limit input box
-			//if unchecked, clear limit field
-			id = e.target.id.split('_')[3];
-			if ($('#connection_auto_accept_'+id).prop('checked') == false) $('#connection_limit_'+id).val('');
-			if ($('#connection_auto_accept_'+id).prop('checked') == true) {
-				$('#connection_limit_'+id).val('100');
-				$('#connection_limit_'+id).focus();
-			}
-			connections_submit(id, 'limit');
-		});
-
-		$("input[id^='connection_limit_']").on('input', function(e) {
-			//check checkbox if input contains data
-			//uncheck checkbox if input is cleared
-			id = e.target.id.split('_')[2];
-			$('#connection_limit_'+id).parent().removeClass('has-error');
-			if (e.target.value != '' && $('#connection_auto_accept_'+id).prop('checked') == false) $('#connection_auto_accept_'+id).prop('checked', true);
-			if (e.target.value == '' && $('#connection_auto_accept_'+id).prop('checked') == true) $('#connection_auto_accept_'+id).prop('checked', false);
-		});
-
-		$("input[id^='connection_limit_']").change(function(e) {
-			id = e.target.id.split('_')[2];
-			connections_submit(id, 'limit');
-		});
 	}
 
 //Connection
@@ -706,8 +675,6 @@
 		//Interpret 0 as NULL for limit and favorite, '' as NULL for name
 
 		can_submit = false;
-
-		//TODO: auto_limit implementation is outdated. Fix it!
 
 		if (field == 'limit') {
 			$('#connection_amount').val($('#connection_amount').val().replace(',','.'));
