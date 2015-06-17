@@ -147,7 +147,7 @@ $('#loginForm').submit(function() {
 		'POST', //type
 		false, //secure
 		{user: $('#loginEmail').val(), password: $('#loginPassword').val(), provider: 'password'}, //data,
-		true, //notification
+		false, //notification
 		{
 			success: function(data){
 				localStorage.setItem('user_series', data.series);
@@ -159,11 +159,71 @@ $('#loginForm').submit(function() {
 				$.bootstrapGrowl('Logged in', {'delay':2000, 'type':'success'});
 				$('#loginModal').modal('hide');
 				$(window).hashchange();
+			},
+			error: function(xhr, errorType, exception) {
+				//revert
+				pwd_incorrect = false;
+				var error_data = $.parseJSON(xhr.responseText);
+				if (error_data.error.code == 'incorrect_credentials') pwd_incorrect = true;
+				if (pwd_incorrect) {
+					$('#loginModal').modal('hide');
+					//$('#loginModal').on('hidden.bs.modal', function (e) {
+						$('#requestPasswordResetModal').modal({keyboard: false, backdrop: 'static'});
+						$('#requestPasswordResetModal').on('hidden.bs.modal', function (e) {
+							$('#loginModal').modal({keyboard: false, backdrop: 'static'});
+						});
+					//});
+
+				} else {
+					$.bootstrapGrowl(error_data.error.text, {'delay':2000, 'type':'danger'});
+				}
 			}
 		} //ajax options
 		);
 	return false;
 });
+
+function change_password_submit() {
+	$.ajaxWrapper(
+		'register/reset_password', //resource
+		'POST', //type
+		false, //secure
+		{identifier: $('#loginEmail').val(), token: $('#resetToken').val(), password: $('#resetPassword').val()}, //data,
+		true, //notification
+		{
+			success: function(data){
+				$.bootstrapGrowl("Password successfully changed. Please login with your new password.", {'delay':2000, 'type':'success'});
+				$('#resetPasswordModal').modal('hide');
+
+			}
+		} //ajax options
+	);
+}
+
+function change_password_form(sender) {
+	$(sender).unbind();
+	$(sender).modal('hide');
+	$('#resetPasswordModal').modal({keyboard: false, backdrop: 'static'});
+	$('#resetPasswordModal').on('hidden.bs.modal', function (e) {
+		$('#loginModal').modal({keyboard: false, backdrop: 'static'});
+	});
+}
+
+function request_reset() {
+	$.ajaxWrapper(
+		'register/request_reset_password', //resource
+		'POST', //type
+		false, //secure
+		{identifier: $('#loginEmail').val()}, //data,
+		true, //notification
+		{
+			success: function(data){
+				$.bootstrapGrowl("Email with token sent", {'delay':2000, 'type':'success'});
+				change_password_form('#requestPasswordResetModal');
+			}
+		} //ajax options
+	);
+}
 
 //currencies
 	var currencies = {
