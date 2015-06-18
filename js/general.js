@@ -85,13 +85,8 @@ $(window).hashchange( function(){
 
 	if (localStorage.getItem('user_id') === null) {
 		//Not logged in
-		if (hash_split[0] == 'test') {
-			$('#loginEmail').val("pete@mailinator.com");
-			$('#loginPassword').val("aa");
-		} else {
-			$('#loginEmail').val("");
-			$('#loginPassword').val("");
-		}
+		$('#loginEmail').val("");
+		$('#loginPassword').val("");
 		$('#username_top').html("");
 		$('#username_left').html("");
 		$('#loginModal').modal({keyboard: false, backdrop: 'static'});
