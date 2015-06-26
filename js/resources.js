@@ -710,14 +710,14 @@
 				$('#connection_favorite').removeClass('text-muted');
 				$('#connection_favorite').addClass('glyphicon-star');
 				$('#connection_favorite').addClass('connections_yellow');
-				value = 1;
+				value = true;
 			} else {
 				//to become a non-favorite
 				$('#connection_favorite').addClass('glyphicon-star-empty');
 				$('#connection_favorite').addClass('text-muted');
 				$('#connection_favorite').removeClass('glyphicon-star');
 				$('#connection_favorite').removeClass('connections_yellow');
-				value = null;
+				value = false;
 			}
 			contact_post(id, 'favorite', value);
 		}
