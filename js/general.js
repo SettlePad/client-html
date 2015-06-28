@@ -90,6 +90,7 @@ $(window).hashchange( function(){
 		$('#username_top').html("");
 		$('#username_left').html("");
 		$('#loginModal').modal({keyboard: false, backdrop: 'static'});
+		$('#loginEmail').focus();
 	} else {
 		//Logged in
 		$('#username_top').html(localStorage.getItem('user_name'));
