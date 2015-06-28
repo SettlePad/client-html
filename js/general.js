@@ -90,7 +90,6 @@ $(window).hashchange( function(){
 		$('#username_top').html("");
 		$('#username_left').html("");
 		$('#loginModal').modal({keyboard: false, backdrop: 'static'});
-		$('#loginEmail').focus();
 	} else {
 		//Logged in
 		$('#username_top').html(localStorage.getItem('user_name'));
@@ -133,6 +132,10 @@ $(window).hashchange( function(){
 			document.location.hash = 'balance';
 		}
 	}
+})
+
+$('#loginModal').on('shown.bs.modal', function (e) {
+	$('#loginEmail').focus();
 })
 
 //Catch the login form submit
