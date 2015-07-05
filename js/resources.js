@@ -309,6 +309,16 @@
 					//send_add();
 			});
 		}
+		$('#sendform_to').on('paste', function () {
+		  setTimeout(function () {
+				if(contacts_loaded) {
+					$('#sendform_to').typeahead('val', $('#sendform_to').val().match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi) );
+				} else {
+					$('#sendform_to').val($('#sendform_to').val().match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi));
+				}
+		  }, 100);
+		});
+
 		$('#sendform_description').focus();
 
 		$('#send_form').submit(function() {
