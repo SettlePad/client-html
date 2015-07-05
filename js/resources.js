@@ -618,7 +618,17 @@
 
 		var compiledTemplate = Handlebars.getTemplate('connection');
 		if (id in contacts) {
-			$("#content").html(compiledTemplate({connection: contacts[id],default_currency: currency_key}));
+			auto_accept_manual = (contacts[id].auto_accept == 0);
+			auto_accept_up_to_limit = (contacts[id].auto_accept == 1);
+			auto_accept_automatic = (contacts[id].auto_accept == 2);
+			$("#content").html(compiledTemplate({
+				connection: contacts[id],
+				default_currency: currency_key,
+				auto_accept_manual: auto_accept_manual,
+				auto_accept_up_to_limit: auto_accept_up_to_limit,
+				auto_accept_automatic: auto_accept_automatic,
+			}));
+			render_limits_table(auto_accept_up_to_limit); //in other cases, hide it
 		} else {
 			$("#content").html(compiledTemplate());
 		}
@@ -626,6 +636,13 @@
 		$("#connection_name").change(function(e) {
 			connection_submit(id, 'name');
 		});
+
+
+		//$('#auto_accept_div .btn').click(function(){
+		$('input[name="auto_accept"]').change(function() {
+			    connection_submit(id,'auto_accept');
+		});
+
 
 		$('#connection_currency_input').typeahead(null, {
 			displayKey: 'key',
@@ -638,6 +655,14 @@
 		$('#connection_currency_input').bind('typeahead:selected', function(evt,suggestion,dataset){
 			connection_parse_currency();
 		});
+	}
+
+	function render_limits_table(show){
+		if (show) {
+			$('#limits_table').show();
+		} else {
+			$('#limits_table').hide();
+		}
 	}
 
 	function connection_set_currency(currency) {
@@ -703,6 +728,10 @@
 				$('#connection_name').parent().removeClass('has-success');
 			}, 1000);
 			contact_post(id, 'friendly_name', value);
+		} else if (field == 'auto_accept') {
+				value = parseInt($('input[name="auto_accept"]:radio:checked').val());
+				render_limits_table(value == 1);
+				contact_post(id, 'auto_accept', value);
 		}  else if (field == 'favorite') {
 			if ($('#connection_favorite').hasClass('glyphicon-star-empty')) {
 				//to become a favorite

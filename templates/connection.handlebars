@@ -33,49 +33,63 @@
       </div>
     </div>
     <div class="form-group" id="connection_limit_group">
-      <label class="col-sm-2 control-label" for="connection_limit">Auto accept limits</label>
+      <label class="col-sm-2 control-label" for="connection_limit">Auto accept memos</label>
       <div class="col-sm-8" id="connection_limit">
-        <div class="input-group bottom15" id="connection_amount_group">
-          <span class="input-group-btn">
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span id="connection_currency">{{default_currency}}</span> <span class="caret"></span></button>
-            <ul class="dropdown-menu" role="menu">
-              <li><a href="javascript:connection_set_currency('USD');">USD</a></li>
-              <li><a href="javascript:connection_set_currency('GBP');">GBP</a></li>
-              <li><a href="javascript:connection_set_currency('EUR');">EUR</a></li>
-              <li class="divider"></li>
-              <li><a href="javascript:connection_show_currency_form();">Other</a></li>
-            </ul>
-          </span>
-          <input type="text" class="form-control" id="connection_amount" placeholder="Limit">
-          <span class="input-group-btn">
-            <a href="javascript:void(0);" onclick="connection_submit('{{connection.id}}','limit');" class="btn btn-primary" type="button">Add</a>
-          </span>
+        <div class="btn-group" data-toggle="buttons" id="auto_accept_div">
+          <label class="btn btn-default active">
+            <input type="radio" name="auto_accept" id="auto_accept_0" value="0" autocomplete="off" {{#if auto_accept_manual}}checked{{/if}}> Never
+          </label>
+          <label class="btn btn-default">
+            <input type="radio" name="auto_accept" id="auto_accept_1" value="1" autocomplete="off" {{#if auto_accept_up_to_limit}}checked{{/if}}> Up to limit
+          </label>
+          <label class="btn btn-default">
+            <input type="radio" name="auto_accept" id="auto_accept_2" value="2" autocomplete="off" {{#if auto_accept_automatic}}checked{{/if}}> Always
+          </label>
         </div>
-        <div class="input-group hidden bottom15" id="connection_currency_group">
-          <input type="text" class="form-control" value="{{default_currency}}" id="connection_currency_input" placeholder="Currency">
-          <span class="input-group-btn">
-            <a href="javascript:void(0);" onclick="connection_parse_currency();" class="btn btn-primary" type="button">Set</a>
-          </span>
+        <br/><br/>
+        <div id="limits_table">
+          <div class="input-group bottom15" id="connection_amount_group">
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"><span id="connection_currency">{{default_currency}}</span> <span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="javascript:connection_set_currency('USD');">USD</a></li>
+                <li><a href="javascript:connection_set_currency('GBP');">GBP</a></li>
+                <li><a href="javascript:connection_set_currency('EUR');">EUR</a></li>
+                <li class="divider"></li>
+                <li><a href="javascript:connection_show_currency_form();">Other</a></li>
+              </ul>
+            </span>
+            <input type="text" class="form-control" id="connection_amount" placeholder="Limit">
+            <span class="input-group-btn">
+              <a href="javascript:void(0);" onclick="connection_submit('{{connection.id}}','limit');" class="btn btn-primary" type="button">Add</a>
+            </span>
+          </div>
+          <div class="input-group hidden bottom15" id="connection_currency_group">
+            <input type="text" class="form-control" value="{{default_currency}}" id="connection_currency_input" placeholder="Currency">
+            <span class="input-group-btn">
+              <a href="javascript:void(0);" onclick="connection_parse_currency();" class="btn btn-primary" type="button">Set</a>
+            </span>
+          </div>
+
+          <ul class="list-group">
+            {{#each connection.limits}}
+              <li class="list-group-item">
+                <div class="row">
+
+                  <div class="col-xs-9">
+                    {{@key}} {{this}}
+                  </div>
+                  <div class="col-xs-3 text-right">
+                    <a href="javascript:connection_remove_limit('{{../connection.id}}','{{@key}}');"><span class="glyphicon glyphicon-remove text-muted"></span></a>
+                  </div>
+                </div>
+              </li>
+            {{/each}}
+          </ul>
+
+
+          <span class="help-block">SettlePad will automatically accept incoming memos until the sum of the last 24 hours crosses the specified (positive) limit.</span>
         </div>
-
-        <ul class="list-group">
-          {{#each connection.limits}}
-            <li class="list-group-item">
-              <div class="row">
-
-                <div class="col-xs-9">
-                  {{@key}} {{this}}
-                </div>
-                <div class="col-xs-3 text-right">
-                  <a href="javascript:connection_remove_limit('{{../connection.id}}','{{@key}}');"><span class="glyphicon glyphicon-remove text-muted"></span></a>
-                </div>
-              </div>
-            </li>
-          {{/each}}
-        </ul>
-
-
-        <span class="help-block">SettlePad will automatically accept incoming memos until the sum of the last 24 hours crosses the specified (positive) limit.</span>
       </div>
     </div>
   </form>
