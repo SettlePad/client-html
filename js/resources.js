@@ -537,7 +537,6 @@
 //Settings
 	function settings(){
 		var compiledTemplate = Handlebars.getTemplate('settings');
-		identifiers = $.parseJSON(localStorage.getItem('user_identifiers'));
 		if (identifiers == null) {
 			login_credentials_count = 0;
 		} else {
@@ -616,8 +615,15 @@
 		}
 	}
 
+//Identifiers
+	function identifiers_load() {
+		var compiledTemplate = Handlebars.getTemplate('identifiers');
+		$("#content").html(compiledTemplate({identifiers: identifiers}));
+	}
+
 //Connections
 	function connections_load() {
+		//TODO: slow to load!
 		var compiledTemplate = Handlebars.getTemplate('connections');
 		$("#content").html(compiledTemplate({connections: contacts}));
 	}
@@ -786,10 +792,11 @@
 		);
 	}
 
-//Local contacts database (only API-contacts in webversion)
+//Local metadata: contacts, limits and identifiers
 	var contacts = {}; //dict
 	var contacts_loaded = false;
 	var limits = {}; //dict
+	var identifiers = []; //array
 
 	function contacts_get(show_connections) {
 		//Load contacts first and limits afterwards
@@ -848,14 +855,17 @@
 		}
 	}
 
-	function contacts_get_if_needed(){
+	function sync_metadata_if_needed(){
 		if (localStorage.getItem('user_contacts_last_update') === null || Number(localStorage.getItem('user_contacts_last_update')) < (moment().unix() - 60*60*24)) {
 			//update if not present, otherwise every 24h
 			contacts_get(false);
+			//TODO: also update identifiers
+
 		} else if(!contacts_loaded) {
 			//put in contacts var
 			contacts = $.parseJSON(localStorage.getItem('user_contacts'));
  			limits = $.parseJSON(localStorage.getItem('user_limits'));
+			identifiers = $.parseJSON(localStorage.getItem('user_identifiers'));
 			contacts_loaded = true;
 		}
 	}

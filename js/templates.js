@@ -1,6 +1,7 @@
 
 //Template loader
 //see http://berzniz.com/post/24743062344/handling-handlebars-js-like-a-pro
+//resulting terminal command: handlebars templates/ >> js/templates.js
 //TODO: compile all templates into templates.js
 Handlebars.getTemplate = function(name) {
   if (Handlebars.templates === undefined || Handlebars.templates[name] === undefined) {

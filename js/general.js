@@ -94,7 +94,7 @@ $(window).hashchange( function(){
 		//Logged in
 		$('#username_top').html(localStorage.getItem('user_name'));
 		$('#username_left').html(localStorage.getItem('user_name'));
-		contacts_get_if_needed(); //Check whether contacts should be obtained, and if so, do so
+		sync_metadata_if_needed(); //Check whether contacts etc. should be obtained, and if so, do so
 
 		if (hash_split[0] == 'transactions') {
 			search = '';
@@ -109,6 +109,8 @@ $(window).hashchange( function(){
 			settings();
 		} else if (hash == 'connections') {
 			contacts_get(true);
+		} else if (hash == 'identifiers') {
+			identifiers_load();
 		} else if (hash_split[0] == 'connection'){
 			connection_load(hash_split[1]);
 		} else if (hash == 'logout') {
@@ -125,6 +127,11 @@ $(window).hashchange( function(){
 			Object.keys(localStorage).forEach(function(key){
 				if (/^user_/.test(key)) localStorage.removeItem(key); //kill all localstorage items starting with user_
 			});
+			contacts = {}; //dict
+			contacts_loaded = false;
+			limits = {}; //dict
+			identifiers = {}; //dict
+
 			$("#content").html('');
 			document.location.hash = '';
 		} else {
@@ -155,6 +162,8 @@ $('#loginForm').submit(function() {
 				localStorage.setItem('user_name', data.user_name);
 				localStorage.setItem('user_default_currency', data.default_currency);
 				localStorage.setItem('user_identifiers', JSON.stringify(data.identifiers));
+				identifiers = data.identifiers;
+
 				$.bootstrapGrowl('Logged in', {'delay':2000, 'type':'success'});
 				$('#loginModal').modal('hide');
 				$(window).hashchange();

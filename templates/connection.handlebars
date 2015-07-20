@@ -36,13 +36,13 @@
       <label class="col-sm-2 control-label" for="connection_limit">Auto accept memos</label>
       <div class="col-sm-8" id="connection_limit">
         <div class="btn-group" data-toggle="buttons" id="auto_accept_div">
-          <label class="btn btn-default active">
+          <label class="btn btn-default {{#if auto_accept_manual}}active{{/if}}">
             <input type="radio" name="auto_accept" id="auto_accept_0" value="0" autocomplete="off" {{#if auto_accept_manual}}checked{{/if}}> Never
           </label>
-          <label class="btn btn-default">
+          <label class="btn btn-default {{#if auto_accept_up_to_limit}}active{{/if}}">
             <input type="radio" name="auto_accept" id="auto_accept_1" value="1" autocomplete="off" {{#if auto_accept_up_to_limit}}checked{{/if}}> Up to limit
           </label>
-          <label class="btn btn-default">
+          <label class="btn btn-default {{#if auto_accept_automatic}}active{{/if}}">
             <input type="radio" name="auto_accept" id="auto_accept_2" value="2" autocomplete="off" {{#if auto_accept_automatic}}checked{{/if}}> Always
           </label>
         </div>
@@ -86,65 +86,12 @@
               </li>
             {{/each}}
           </ul>
-
-
           <span class="help-block">SettlePad will automatically accept incoming memos until the sum of the last 24 hours crosses the specified (positive) limit.</span>
         </div>
       </div>
     </div>
   </form>
 
-<!--
-  <div class="table-responsive">
-    <table class="table table-hover">
-  	<thead>
-  	  <tr>
-  		<th></th>
-  		<th>Friendly name</th>
-  		<th class="text-nowrap">Auto accept UOMes <a href="javascript:void(0);" tabindex="0" id="connections_popover_auto_accept" data-toggle="popover" data-trigger="focus" title="Auto accept UOMes" data-content="Automatically accept UOMes you receive from a specific connection, up to the specified limit. If activated, IOUs you receive from this connection in your primary currency will always be accepted automatically." data-container="body"  data-placement="bottom"><span class="glyphicon glyphicon-info-sign"></span></a></th>
-  		<th class="text-nowrap">Favorite debtor <a href="javascript:void(0);" tabindex="0" id="connections_popover_favorite_debtor" data-toggle="popover" data-trigger="focus" title="Favorite debtor" data-content="SettePad allocates as much as possible of the receivables to your starred connections. So now you can pay beer for friend A (who is a lousy debtor to you) and instead, get it back from starred friend B." data-container="body" data-placement="bottom"><span class="glyphicon glyphicon-info-sign"></span></a></th>
-  	  </tr>
-  	</thead>
-  	<tbody>
-      {{#each connections}}
-    	  <tr>
-      		<td>
-      			<ul class="list-unstyled">
-      				<li><strong>{{name}}</strong></li>
-                {{#each identifiers}}
-      				      <li>{{#unless active}}<s>{{/unless}}{{identifier}}{{#unless active}}</s>{{/unless}}</li>
-                {{/each}}
-      			</ul>
-      		</td>
-      		<td>
-      			<form class="form-inline" role="form">
-      				<div class="form-group connections_formgroup">
-      					<label class="sr-only" for="connection_name_{{id}}">Friendly name</label>
-      					<input type="text" class="form-control connections_name" id="connection_name_{{id}}" placeholder="{{name}}" maxlength="100" value="{{#if friendly_name}}{{friendly_name}}{{/if}}">
-      				</div>
-      			</form>
-      		</td>
-      		<td>
-      			<form class="form-inline" role="form">
-      				<div class="checkbox">
-      					<label>
-      						<input type="checkbox" class="connections_limit_checkbox" id="connection_auto_accept_{{id}}" {{#if auto_limit}}checked{{/if}}>
-      					</label>
-      				</div>
-      				<div class="form-group connections_formgroup">
-      					<label class="sr-only" for="connection_limit_{{id}}">Limit</label>
-      					<input type="text" class="form-control connections_limit_inputbox" id="connection_limit_{{id}}" placeholder="Limit [EUR]" value="{{#if auto_limit}}{{auto_limit}}{{/if}}">
-      				</div>
-      			</form>
-      		</td>
-      		<td>
-      		</td>
-    	  </tr>
-      {{/each}}
-  	</tbody>
-    </table>
-  </div>
--->
 {{else}}
   <p>The contact does not exist.</p>
 {{/if}}

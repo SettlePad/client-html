@@ -3,7 +3,7 @@
   <li class="active">Identifiers</li>
 </ol>
 
-<form role="form">
+<!--<form role="form">
   <div class="form-group" id="settings_name_group">
     <label class="control-label sr-only" for="settings_name">Name</label>
     <div class="input-group">
@@ -23,7 +23,7 @@
       </span>
     </div>
   </div>
-</form>
+</form>-->
 
 
 {{#if identifiers}}
@@ -31,14 +31,21 @@
     {{#each identifiers}}
       <li class="list-group-item">
         <div class="row">
-          <div class="col-xs-9">
-            {{@key}} {{this}}
-          </div>
-          <div class="col-xs-3 text-right">
-            <a href="javascript:remove('{{../connection.id}}','{{@key}}');"><span class="glyphicon glyphicon-remove text-muted"></span></a>
+          <div class="col-xs-12">
+            {{identifier}}
+            <p class="transactions_buttons">
+              <a href="javascript:identifier_change_pwd(''{{identifier}}'');" class="btn btn-default" role="button">Change password</a>
+              {{#unless verified}}
+                <a href="javascript:identifier_verify('{{identifier}}');" class="btn btn-primary" role="button">Enter verification code</a>
+                <a href="javascript:identifier_resend_verification_code('{{identifier}}');" class="btn btn-default" role="button">Resend verification code</a>
+              {{/unless}}
+              <a href="javascript:identifier_remove('{{identifier}}');" class="btn btn-danger" role="button">Delete</a>
+            </p>
           </div>
         </div>
       </li>
     {{/each}}
   </ul>
 {{/if}}
+
+<a href="javascript:identifier_add();" class="btn btn-default">Add a new identifier</button>
