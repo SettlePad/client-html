@@ -199,7 +199,7 @@
 				data[index].time_sent_humane = d.fromNow();
 				data[index].time_sent_formatted = d.format('D MMMM YYYY, HH:mm:ss');
 
-				if(data[index].status <=1 && data[index].is_sender && moment().diff(d,'minutes') <= 4) {
+				if((data[index].status == 0 && data[index].is_sender && moment().diff(d,'minutes') <= 4) || (data[index].status == 1 && data[index].is_sender)) {
 					data[index].can_cancel = true;
 				} else {
 					data[index].can_cancel = false;
@@ -599,7 +599,7 @@
 		$('#identifiersAddIdentifierModal').on('shown.bs.modal', function (e) {
 			$('#identifiersAddIdentifierModalEmail').val('');
 			$('#identifiersAddIdentifierModalPassword').val('');
-			$('#identifiersAddIdentifierModalPassword2').val('');						
+			$('#identifiersAddIdentifierModalPassword2').val('');
 			$('#identifiersAddIdentifierModalEmail').focus();
 		})
 		$('#identifiersChangePasswordModal').on('shown.bs.modal', function (e) {
