@@ -76,7 +76,7 @@
 	text-align: center;
 }
 
-.memo_list_remove {
+.list_group_action_right {
 	float: right;
 	display: inline-block;
 	min-width: 10px;
