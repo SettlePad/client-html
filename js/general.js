@@ -18,10 +18,9 @@ jQuery.ajaxWrapper = function(resource, type, secure, data, notification, ajaxOp
 	$.ajax($.extend({
 		type: type,
 		contentType: contenttype,
-		//url: "http://127.0.0.1/api/"+resource, //local
-		url: "http://www.settlepad.com/api/"+resource, //web
+		url: "http://127.0.0.1/api/"+resource, //local
+		//url: "http://www.settlepad.com/api/"+resource, //web
 		dataType: "json",
-		//data: {data: data},
 		data: data,
 		beforeSend: function(jqXHR, settings){
 			var timestamp = Math.round((new Date()).getTime() / 1000);
@@ -130,7 +129,7 @@ $(window).hashchange( function(){
 			contacts = {}; //dict
 			contacts_loaded = false;
 			limits = {}; //dict
-			identifiers = {}; //dict
+			identifiers = []; //array
 
 			$("#content").html('');
 			document.location.hash = '';
@@ -233,7 +232,102 @@ function request_reset() {
 	);
 }
 
-//currencies
+//Validate email address
+	function validate_email(email,token) {
+		$.ajaxWrapper(
+			'register/verify/', //resource
+			'POST', //type
+			false, //secure
+			{identifier: email, token: token}, //data,
+			true, //notification
+			{
+				success: function(data){
+					$.bootstrapGrowl('Email address validated. Now please login', {'delay':2000, 'type':'success'});
+					document.location.hash = 'reset';
+					$(window).hashchange();
+				}
+			} //ajax options
+		);
+	}
+
+//Format number
+	function number_format(number,decimals,show_sign) {
+		var decimal_sep = '.';
+		var thousand_sep = ',';
+		if(!show_sign) {
+			number = Math.abs(number);
+		} else {
+			number = number*1;
+		}
+		number = number.toFixed(decimals) + '';
+		var x = number.split('.');
+		var x1 = x[0];
+		var x2 = x.length > 1 ? decimal_sep + x[1] : '';
+		var rgx = /(\d+)(\d{3})/;
+		while (rgx.test(x1)) {
+			x1 = x1.replace(rgx, '$1' + thousand_sep + '$2');
+		}
+		return x1 + x2;
+	}
+
+
+//Typeahead function: clean input
+	function escapeRegExp(str) {
+		return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+	}
+
+//Typeahead for currencies
+	var substringCurrencyMatcher = function() {
+		return function findMatches(q, cb) {
+			var matches, substrRegex;
+
+			// an array that will be populated with substring matches
+			matches = [];
+
+			// regex used to determine if a string contains the substring `q`
+			substrRegex = new RegExp(escapeRegExp(q), 'i');
+
+			// iterate through the pool of strings and for any string that
+			// contains the substring `q`, add it to the `matches` array
+			$.each(currencies, function(key, value) {
+				if (substrRegex.test(value) || substrRegex.test(key)) {
+					// the typeahead jQuery plugin expects suggestions to a
+					// JavaScript object, refer to typeahead docs for more info
+					matches.push({ key: key, value: value});
+				}
+			});
+
+			cb(matches);
+		};
+	};
+
+//Typeahead for recipients
+	var substringContactsMatcher = function() {
+	  return function findMatches(q, cb) {
+	    var matches, substrRegex;
+
+	    // an array that will be populated with substring matches
+	    matches = [];
+
+	    // regex used to determine if a string contains the substring `q`
+	    substrRegex = new RegExp(escapeRegExp(q), 'i');
+
+	    // iterate through the pool of strings and for any string that
+	    // contains the substring `q`, add it to the `matches` array
+	    $.each(contacts, function(i, contact) {
+				$.each(contact.identifiers, function(j, identifier) {
+	      	if (substrRegex.test(identifier.identifier) || substrRegex.test(contact.name)) {
+	        	// the typeahead jQuery plugin expects suggestions to a
+	        	// JavaScript object, refer to typeahead docs for more info
+	        	matches.push({ name: contact.name, identifier: identifier.identifier, identifier_type: identifier.type});
+	      	}
+	    	});
+			});
+	    cb(matches);
+	  };
+	};
+
+//Currencies
 	var currencies = {
 		'AFN':'Afghani',
 		'ALL':'Lek',
@@ -394,3 +488,10 @@ function request_reset() {
 		'ZMW':'New Zambian Kwacha',
 		'ZWL':'Zimbabwe Dollar'
 	};
+
+	//Check whether email adres conforms to spec
+		function isValidEmailAddress(emailAddress) {
+			//thanks to http://stackoverflow.com/questions/2855865/jquery-regex-validation-of-e-mail-address
+			var pattern = new RegExp(/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i);
+			return pattern.test(emailAddress);
+		};

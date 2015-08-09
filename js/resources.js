@@ -381,31 +381,6 @@
 		}
 	}
 
-	//Typeahead for recipients
-	var substringContactsMatcher = function() {
-	  return function findMatches(q, cb) {
-	    var matches, substrRegex;
-
-	    // an array that will be populated with substring matches
-	    matches = [];
-
-	    // regex used to determine if a string contains the substring `q`
-	    substrRegex = new RegExp(escapeRegExp(q), 'i');
-
-	    // iterate through the pool of strings and for any string that
-	    // contains the substring `q`, add it to the `matches` array
-	    $.each(contacts, function(i, contact) {
-				$.each(contact.identifiers, function(j, identifier) {
-	      	if (substrRegex.test(identifier.identifier) || substrRegex.test(contact.name)) {
-	        	// the typeahead jQuery plugin expects suggestions to a
-	        	// JavaScript object, refer to typeahead docs for more info
-	        	matches.push({ name: contact.name, identifier: identifier.identifier, identifier_type: identifier.type});
-	      	}
-	    	});
-			});
-	    cb(matches);
-	  };
-	};
 
 	var send_list = []; //array of memos
 	var send_list_id = 0;
@@ -619,6 +594,188 @@
 	function identifiers_load() {
 		var compiledTemplate = Handlebars.getTemplate('identifiers');
 		$("#content").html(compiledTemplate({identifiers: identifiers}));
+
+		//Add listeners
+		$('#identifiersAddIdentifierModal').on('shown.bs.modal', function (e) {
+			$('#identifiersAddIdentifierModalEmail').val('');
+			$('#identifiersAddIdentifierModalPassword').val('');
+			$('#identifiersAddIdentifierModalPassword2').val('');						
+			$('#identifiersAddIdentifierModalEmail').focus();
+		})
+		$('#identifiersChangePasswordModal').on('shown.bs.modal', function (e) {
+			$('#identifiersChangePasswordModalPassword').val('');
+			$('#identifiersChangePasswordModalPassword2').val('');
+			$('#identifiersChangePasswordModalPassword').focus();
+		})
+		$('#identifiersVerifyIdentifierModal').on('shown.bs.modal', function (e) {
+			$('#identifiersVerifyIdentifierModalToken').val('');
+			$('#identifiersVerifyIdentifierModalToken').focus();
+		})
+	}
+
+	//Add a new identifier
+		//Show modal
+		function identifier_add() {
+			$('#identifiersAddIdentifierModal').modal();
+		}
+
+		//Process submit
+		function identifier_add_submit() {
+			is_valid = true;
+			if (!isValidEmailAddress($('#identifiersAddIdentifierModalEmail').val())) {
+					$('#identifiersAddIdentifierModalEmail').focus();
+					is_valid = false;
+					$('#identifiersAddIdentifierModalEmail').parent().addClass('has-error');
+			} else {
+					$('#identifiersAddIdentifierModalEmail').parent().removeClass('has-error');
+			}
+			if ($('#identifiersAddIdentifierModalPassword').val() == '' || $('#identifiersAddIdentifierModalPassword').val() != $('#identifiersAddIdentifierModalPassword2').val()) {
+					if (is_valid) $('#identifiersAddIdentifierModalPassword').focus();
+					is_valid = false;
+					$('#identifiersAddIdentifierModalPassword').parent().addClass('has-error');
+			} else {
+					$('#identifiersAddIdentifierModalPassword').parent().removeClass('has-error');
+			}
+			if ($('#identifiersAddIdentifierModalPassword2').val() == '' || $('#identifiersAddIdentifierModalPassword').val() != $('#identifiersAddIdentifierModalPassword2').val()) {
+					if (is_valid) $('#identifiersAddIdentifierModalPassword2').focus();
+					is_valid = false;
+					$('#identifiersAddIdentifierModalPassword2').parent().addClass('has-error');
+			} else {
+					$('#identifiersAddIdentifierModalPassword2').parent().removeClass('has-error');
+			}
+			if (is_valid) {
+				//hide
+				$('#identifiersAddIdentifierModal').modal('hide');
+
+				//Propagate to API
+				$.ajaxWrapper(
+					'identifiers/new/', //resource
+					'POST', //type
+					true, //secure
+					{identifier: $('#identifiersAddIdentifierModalEmail').val(), password: $('#identifiersAddIdentifierModalPassword').val(), type: 'email'}, //data,
+					true, //notification
+					{
+						success: function(data){
+							//Update local database and refresh
+							identifiers.push(data.data);
+							localStorage.setItem('user_identifiers', JSON.stringify(identifiers)); //TODO: get all localstorage to one place
+							identifiers_load();
+						}
+					} //ajax options
+				);
+			}
+		}
+
+	function identifier_change_pwd_modal(identifier) {
+		$('#identifiersChangePasswordModalIdentifier').html(identifier);
+		$('#identifiersChangePasswordModal').modal();
+	}
+
+	function identifier_change_pwd() {
+		is_valid = true;
+		if ($('#identifiersChangePasswordModalPassword').val() == '' || $('#identifiersChangePasswordModalPassword').val() != $('#identifiersChangePasswordModalPassword2').val()) {
+				if (is_valid) $('#identifiersChangePasswordModalPassword').focus();
+				is_valid = false;
+				$('#identifiersChangePasswordModalPassword').parent().addClass('has-error');
+		} else {
+				$('#identifiersChangePasswordModalPassword').parent().removeClass('has-error');
+		}
+		if ($('#identifiersChangePasswordModalPassword2').val() == '' || $('#identifiersChangePasswordModalPassword').val() != $('#identifiersChangePasswordModalPassword2').val()) {
+				if (is_valid) $('#identifiersChangePasswordModalPassword2').focus();
+				is_valid = false;
+				$('#identifiersChangePasswordModalPassword2').parent().addClass('has-error');
+		} else {
+				$('#identifiersChangePasswordModalPassword2').parent().removeClass('has-error');
+		}
+		if (is_valid) {
+			//hide
+			$('#identifiersChangePasswordModal').modal('hide');
+
+			//Propagate to API
+			$.ajaxWrapper(
+				'identifiers/change_pwd/', //resource
+				'POST', //type
+				true, //secure
+				{identifier: $('#identifiersChangePasswordModalIdentifier').html(), password: $('#identifiersChangePasswordModalPassword').val()}, //data,
+				true, //notification
+				{
+					success: function(data){
+						$.bootstrapGrowl('Password for '+$('#identifiersChangePasswordModalIdentifier').html()+' changed.', {'delay':2000, 'type':'success'});
+					}
+				} //ajax options
+			);
+		}
+	}
+
+	function identifier_verify_modal(identifier) {
+		$('#identifiersVerifyIdentifierModalIdentifier').html(identifier);
+		$('#identifiersVerifyIdentifierModal').modal();
+	}
+
+	function identifier_verify() {
+		$('#identifiersVerifyIdentifierModal').modal('hide');
+
+		//Propagate to API
+		$.ajaxWrapper(
+			'register/verify/', //resource
+			'POST', //type
+			true, //secure
+			{identifier: $('#identifiersVerifyIdentifierModalIdentifier').html(), token: $('#identifiersVerifyIdentifierModalToken').val()}, //data,
+			true, //notification
+			{
+				success: function(data){
+					//Update local database and refresh
+					identifiers = identifiers.filter(function(e){return e.identifier!==$('#identifiersVerifyIdentifierModalIdentifier').html()})
+					identifiers.push(data.data);
+					localStorage.setItem('user_identifiers', JSON.stringify(identifiers)); //TODO: get all localstorage to one place
+					identifiers_load();
+					$.bootstrapGrowl('You have validated '+$('#identifiersChangePasswordModalIdentifier').html()+' successfully.', {'delay':2000, 'type':'success'});
+				}
+			} //ajax options
+		);
+	}
+
+	function identifier_resend_verification_code(identifier) {
+		$.ajaxWrapper(
+			'register/resend_token/', //resource
+			'POST', //type
+			false, //secure
+			{identifier: identifier, user_id: localStorage.getItem('user_id')}, //data,
+			true, //notification
+			{
+				success: function(data){
+					//Update local database and refresh
+					$.bootstrapGrowl('A new verification code has been sent to '+identifier+'.', {'delay':2000, 'type':'success'});
+				}
+			} //ajax options
+		);
+	}
+
+	function identifier_remove_modal(identifier) {
+		$('#identifiersRemoveIdentifierModalIdentifier').html(identifier);
+		$('#identifiersRemoveIdentifierModal').modal();
+	}
+
+	function identifier_remove() {
+		//hide
+		$('#identifiersRemoveIdentifierModal').modal('hide');
+
+		//Propagate to API
+		$.ajaxWrapper(
+			'identifiers/delete/', //resource
+			'POST', //type
+			true, //secure
+			{identifier: $('#identifiersRemoveIdentifierModalIdentifier').html()}, //data,
+			true, //notification
+			{
+				success: function(data){
+					//Update local database and refresh
+					identifiers = identifiers.filter(function(e){return e.identifier!==$('#identifiersRemoveIdentifierModalIdentifier').html()})
+					localStorage.setItem('user_identifiers', JSON.stringify(identifiers)); //TODO: get all localstorage to one place
+					identifiers_load();
+				}
+			} //ajax options
+		);
 	}
 
 //Connections
@@ -743,11 +900,11 @@
 			setTimeout(function() {
 				$('#connection_name').parent().removeClass('has-success');
 			}, 1000);
-			contact_post(id, 'friendly_name', value);
+			connection_post(id, 'friendly_name', value);
 		} else if (field == 'auto_accept') {
 				value = parseInt($('input[name="auto_accept"]:radio:checked').val());
 				render_limits_table(value == 1);
-				contact_post(id, 'auto_accept', value);
+				connection_post(id, 'auto_accept', value);
 		}  else if (field == 'favorite') {
 			if ($('#connection_favorite').hasClass('glyphicon-star-empty')) {
 				//to become a favorite
@@ -764,7 +921,7 @@
 				$('#connection_favorite').removeClass('connections_yellow');
 				value = false;
 			}
-			contact_post(id, 'favorite', value);
+			connection_post(id, 'favorite', value);
 		}
 
 	}
@@ -774,20 +931,46 @@
 		connection_load(id);
 	}
 
-//Validate email address
-	function validate_email(email,token) {
+	function connection_post(id, field, value) {
+		//Update local database
+		if (id in contacts) {
+			contacts[id][field] = value;
+			localStorage.setItem('user_contacts', JSON.stringify(contacts));
+		}
+
+		//Propagate to API
 		$.ajaxWrapper(
-			'register/verify/', //resource
+			'contacts/'+id, //resource
 			'POST', //type
-			false, //secure
-			{identifier: email, token: token}, //data,
-			true, //notification
+			true, //secure
+			{field: field, value: value}, //data,
+			false, //notification
 			{
-				success: function(data){
-					$.bootstrapGrowl('Email address validated. Now please login', {'delay':2000, 'type':'success'});
-					document.location.hash = 'reset';
-					$(window).hashchange();
-				}
+			} //ajax options
+		);
+	}
+
+	function limit_post(contact_id, currency, value) {
+		//Update local database
+		if (limits == null) limits = {};
+		if (!(contact_id in limits)) limits[contact_id] = {};
+
+		if (value > 0) {
+			limits[contact_id][currency] = value;
+		} else {;
+			delete limits[contact_id][currency];
+			value = 0;
+		}
+		add_limits_to_contacts();
+
+		//Propagate to API
+		$.ajaxWrapper(
+			'autolimits/'+contact_id+'/'+currency, //resource
+			'POST', //type
+			true, //secure
+			{auto_limit: value}, //data,
+			false, //notification
+			{
 			} //ajax options
 		);
 	}
@@ -807,7 +990,7 @@
 			'GET', //type
 			true, //secure
 			{}, //data,
-			false, //notification
+			show_connections, //notification
 			{
 				success: function(data){
 					contacts = data.data;
@@ -870,101 +1053,7 @@
 		}
 	}
 
-	function contact_post(id, field, value) {
-		//Update local database
-		if (id in contacts) {
-			contacts[id][field] = value;
-			localStorage.setItem('user_contacts', JSON.stringify(contacts));
-		}
 
-		//Propagate to API
-		$.ajaxWrapper(
-			'contacts/'+id, //resource
-			'POST', //type
-			true, //secure
-			{field: field, value: value}, //data,
-			false, //notification
-			{
-			} //ajax options
-		);
-	}
 
-	function limit_post(contact_id, currency, value) {
-		//Update local database
-		if (limits == null) limits = {};
-		if (!(contact_id in limits)) limits[contact_id] = {};
-
-		if (value > 0) {
-			limits[contact_id][currency] = value;
-		} else {;
-			delete limits[contact_id][currency];
-			value = 0;
-		}
-		add_limits_to_contacts();
-
-		//Propagate to API
-		$.ajaxWrapper(
-			'autolimits/'+contact_id+'/'+currency, //resource
-			'POST', //type
-			true, //secure
-			{auto_limit: value}, //data,
-			false, //notification
-			{
-			} //ajax options
-		);
-	}
 
 //General functions
-	function number_format(number,decimals,show_sign) {
-		var decimal_sep = '.';
-		var thousand_sep = ',';
-		if(!show_sign) {
-			number = Math.abs(number);
-		} else {
-			number = number*1;
-		}
-		number = number.toFixed(decimals) + '';
-		var x = number.split('.');
-		var x1 = x[0];
-		var x2 = x.length > 1 ? decimal_sep + x[1] : '';
-		var rgx = /(\d+)(\d{3})/;
-		while (rgx.test(x1)) {
-			x1 = x1.replace(rgx, '$1' + thousand_sep + '$2');
-		}
-		return x1 + x2;
-	}
-
-	function isValidEmailAddress(emailAddress) {
-		//thanks to http://stackoverflow.com/questions/2855865/jquery-regex-validation-of-e-mail-address
-		var pattern = new RegExp(/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i);
-	  return pattern.test(emailAddress);
-	};
-
-	function escapeRegExp(str) {
-  	return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-	}
-
-	//Typeahead for currencies
-	var substringCurrencyMatcher = function() {
-		return function findMatches(q, cb) {
-			var matches, substrRegex;
-
-			// an array that will be populated with substring matches
-			matches = [];
-
-			// regex used to determine if a string contains the substring `q`
-			substrRegex = new RegExp(escapeRegExp(q), 'i');
-
-			// iterate through the pool of strings and for any string that
-			// contains the substring `q`, add it to the `matches` array
-			$.each(currencies, function(key, value) {
-				if (substrRegex.test(value) || substrRegex.test(key)) {
-					// the typeahead jQuery plugin expects suggestions to a
-					// JavaScript object, refer to typeahead docs for more info
-					matches.push({ key: key, value: value});
-				}
-			});
-
-			cb(matches);
-		};
-	};

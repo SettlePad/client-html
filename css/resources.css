@@ -33,9 +33,19 @@
 	text-align: center;
 }
 
-.icon_size {
-	font-size: 24px;
-}
+/* Classes for menu in list group */
+	.icon_size {
+		font-size: 24px;
+	}
+
+	.more-button-div {
+		margin-bottom: -9px;
+	}
+
+	.dropdown_danger {
+	    color: #c54440 !important;
+	}
+
 
 .cursor_pointer {
 	cursor: pointer;
