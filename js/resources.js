@@ -891,20 +891,16 @@
 				connection_load(id);
 			}
 		} else if (field == 'name') {
-			if ($('#connection_name').val() == ''){
-				value = null;
-			} else {
-				value = $('#connection_name').val();
-			}
+			value = $('#connection_name').val();
 			$('#connection_name').parent().addClass('has-success');
 			setTimeout(function() {
 				$('#connection_name').parent().removeClass('has-success');
 			}, 1000);
-			connection_post(id, 'friendly_name', value);
+			connection_post(id, {friendly_name: value});
 		} else if (field == 'auto_accept') {
 				value = parseInt($('input[name="auto_accept"]:radio:checked').val());
 				render_limits_table(value == 1);
-				connection_post(id, 'auto_accept', value);
+				connection_post(id, {auto_accept: value});
 		}  else if (field == 'favorite') {
 			if ($('#connection_favorite').hasClass('glyphicon-star-empty')) {
 				//to become a favorite
@@ -921,7 +917,7 @@
 				$('#connection_favorite').removeClass('connections_yellow');
 				value = false;
 			}
-			connection_post(id, 'favorite', value);
+			connection_post(id, {favorite: value});
 		}
 
 	}
@@ -931,10 +927,12 @@
 		connection_load(id);
 	}
 
-	function connection_post(id, field, value) {
+	function connection_post(id, payload) {
 		//Update local database
 		if (id in contacts) {
-			contacts[id][field] = value;
+			$.each(payload, function(field, value) {
+				contacts[id][field] = value;
+			});
 			localStorage.setItem('user_contacts', JSON.stringify(contacts));
 		}
 
@@ -943,7 +941,7 @@
 			'contacts/'+id, //resource
 			'POST', //type
 			true, //secure
-			{field: field, value: value}, //data,
+			payload, //data,
 			false, //notification
 			{
 			} //ajax options
