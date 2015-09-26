@@ -1,7 +1,7 @@
 <ol class="breadcrumb">
   <li><a href="#settings">Settings</a></li>
-  <li><a href="#connections">Connections</a></li>
-  <li class="active">{{#if connection.friendly_name}}{{connection.friendly_name}}{{else}}{{connection.name}}{{/if}}</li>
+  <li><a href="#connections">Contacts</a></li>
+  <li class="active">{{#if connection}}{{connection.effective_name}}{{/if}}</li>
 </ol>
 
 {{#if connection}}
@@ -26,10 +26,18 @@
       </div>
     </div>
     <div class="form-group" id="connection_favorite_group">
-      <label class="col-sm-2 control-label" for="connection_favorite">Favorite</label>
-      <div class="col-sm-8">
-        <a href="javascript:connection_submit('{{connection.id}}','favorite');"><span id="connection_favorite" class="glyphicon {{#if connection.favorite}}glyphicon-star connections_yellow{{else}}glyphicon-star-empty text-muted{{/if}} icon_size"></span></a>
-        <span class="help-block">SettePad allocates as much as possible of the receivables to your starred connections. So now you can pay beer for friend A (who is a lousy debtor to you) and instead, get it back from starred friend B.</span>
+      <label class="col-sm-2 control-label" for="connection_favorite">Potential defaulter</label>
+      <div class="col-sm-8" id="connection_favorite">
+        <div class="btn-group" data-toggle="buttons" id="favorite_div">
+          <label class="btn btn-default {{#if connection.favorite}}active{{/if}}">
+            <input type="radio" name="favorite" id="favorite_1" value="1" autocomplete="off" {{#if connection.favorite}}checked{{/if}}> No
+          </label>
+          <label class="btn btn-default {{#unless connection.favorite}}active{{/unless}}">
+            <input type="radio" name="favorite" id="favorite_0" value="0" autocomplete="off" {{#unless connection.favorite}}checked{{/unless}}> Yes
+          </label>
+        </div>
+        <span class="help-block">SettlePad will try to minimize the amount you receive from this contact (at the expense of receiving more from others in your contact list).</span>
+
       </div>
     </div>
     <div class="form-group" id="connection_limit_group">
@@ -61,7 +69,7 @@
             </span>
             <input type="text" class="form-control" id="connection_amount" placeholder="Limit">
             <span class="input-group-btn">
-              <a href="javascript:void(0);" onclick="connection_submit('{{connection.id}}','limit');" class="btn btn-primary" type="button">Add</a>
+              <a href="javascript:void(0);" onclick="connection_submit('{{connection.primary_identifier}}','limit');" class="btn btn-primary" type="button">Add</a>
             </span>
           </div>
           <div class="input-group hidden bottom15" id="connection_currency_group">
@@ -80,7 +88,7 @@
                     {{@key}} {{this}}
                   </div>
                   <div class="col-xs-3 text-right">
-                    <a href="javascript:connection_remove_limit('{{../connection.id}}','{{@key}}');"><span class="glyphicon glyphicon-remove text-muted"></span></a>
+                    <a href="javascript:connection_remove_limit('{{../connection.primary_identifier}}','{{@key}}');"><span class="glyphicon glyphicon-remove text-muted"></span></a>
                   </div>
                 </div>
               </li>
@@ -90,8 +98,34 @@
         </div>
       </div>
     </div>
+    <div class="form-group" id="connection_delete_group">
+      <label class="col-sm-2 control-label" for="connection_delete">Delete</label>
+      <div class="col-sm-8" id="connection_delete">
+        <a href="javascript:connection_remove_modal();" class="btn btn-danger">Remove contact</a>
+      </div>
+    </div>
   </form>
 
 {{else}}
   <p>The contact does not exist.</p>
 {{/if}}
+
+
+<!-- Modals -->
+  <div class="modal" id="connectionRemoveModal" tabindex="-1" role="dialog" aria-labelledby="connectionRemoveModalTitle">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="connectionRemoveModalTitle">Remove contact</h4>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to remove {{#if connection}}{{connection.effective_name}}{{/if}} as a contact?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <a href="javascript:connection_remove('{{connection.primary_identifier}}');" role="button" class="btn btn-danger">Remove</a>
+        </div>
+      </div>
+    </div>
+  </div>

@@ -1,20 +1,67 @@
+//Connections
+
 function connections_load() {
-  //TODO: slow to load!
   var compiledTemplate = Handlebars.getTemplate('connections');
   $("#content").html(compiledTemplate({connections: contacts}));
 }
 
+//Show modal
+function connections_add() {
+  $('#connectionsAddContactModal').modal();
+  $('#connectionsAddContactModalEmail').focus();
+}
+
+//Process submit
+function connections_add_submit() {
+  is_valid = true;
+  if (!isValidEmailAddress($('#connectionsAddContactModalEmail').val())) {
+      $('#connectionsAddContactModalEmail').focus();
+      is_valid = false;
+      $('#connectionsAddContactModalEmail').parent().addClass('has-error');
+  } else {
+      $('#connectionsAddContactModalEmail').parent().removeClass('has-error');
+  }
+  if (is_valid) {
+    //hide
+    emailVal = $('#connectionsAddContactModalEmail').val();
+    $('#connectionsAddContactModal').modal('hide');
+
+    //Propagate to API
+    $.ajaxWrapper(
+      'contacts/'+emailVal, //resource
+      'POST', //type
+      true, //secure
+      {favorite: 1, auto_accept: 0, friendly_name: ''}, //data,
+      true, //notification
+      {
+        success: function(data){
+          //Refresh local database and show settings
+          document.location.hash = 'connection/'+emailVal;
+          //contacts_get(false, emailVal);
+        }
+      } //ajax options
+    );
+
+    //Add local
+    contacts.push();
+
+  }
+}
+
+
 //Connection
-function connection_load(id) {
+function connection_load(identifier) {
   currency_key = localStorage.getItem('user_default_currency');
 
   var compiledTemplate = Handlebars.getTemplate('connection');
-  if (id in contacts) {
-    auto_accept_manual = (contacts[id].auto_accept == 0);
-    auto_accept_up_to_limit = (contacts[id].auto_accept == 1);
-    auto_accept_automatic = (contacts[id].auto_accept == 2);
+
+  contactObj = contact_get_by_identifier(identifier);
+  if (contactObj != null) {
+    auto_accept_manual = (contactObj.auto_accept == 0);
+    auto_accept_up_to_limit = (contactObj.auto_accept == 1);
+    auto_accept_automatic = (contactObj.auto_accept == 2);
     $("#content").html(compiledTemplate({
-      connection: contacts[id],
+      connection: contactObj,
       default_currency: currency_key,
       auto_accept_manual: auto_accept_manual,
       auto_accept_up_to_limit: auto_accept_up_to_limit,
@@ -26,15 +73,17 @@ function connection_load(id) {
   }
 
   $("#connection_name").change(function(e) {
-    connection_submit(id, 'name');
+    connection_submit(identifier, 'name');
   });
-
 
   //$('#auto_accept_div .btn').click(function(){
   $('input[name="auto_accept"]').change(function() {
-        connection_submit(id,'auto_accept');
+        connection_submit(identifier,'auto_accept');
   });
 
+  $('input[name="favorite"]').change(function() {
+        connection_submit(identifier,'favorite');
+  });
 
   $('#connection_currency_input').typeahead(null, {
     displayKey: 'key',
@@ -87,10 +136,7 @@ function connection_show_currency_form() {
   }
 }
 
-function connection_submit(id, field) {
-  //Three fields: limit (non-neg float), favorite (0 or 1) and name (string)
-  //Interpret 0 as NULL for limit and favorite, '' as NULL for name
-
+function connection_submit(identifier, field) {
   can_submit = false;
 
   if (field == 'limit') {
@@ -101,13 +147,25 @@ function connection_submit(id, field) {
     } else {
       can_submit = true;
       if ($('#connection_amount').val() == '') {
-        value = null;
+        value = 0;
       } else {
         value = $('#connection_amount').val();
       }
+      currency = $('#connection_currency').html();
       $('#connection_amount').parent().removeClass('has-error');
-      limit_post(id, $('#connection_currency').html(), $('#connection_amount').val());
-      connection_load(id);
+
+      contactObj = contact_get_by_identifier(identifier);
+      if (contactObj != null) {
+        if (value > 0) {
+          if (contactObj.limits == null) contactObj.limits = {}
+          contactObj.limits[currency] = value;
+        } else if (contactObj.limits != null && contactObj.limits[currency] != null) {
+          //so remove it, if it exists
+          delete contactObj.limits[currency]; //limits is a object literal (so dictionary), on which you can do delete, see http://stackoverflow.com/questions/8173210/delete-vs-splice-on-associative-array
+        }
+        connection_post(identifier, {limits: contactObj.limits});
+      }
+      connection_load(identifier);
     }
   } else if (field == 'name') {
     value = $('#connection_name').val();
@@ -115,77 +173,58 @@ function connection_submit(id, field) {
     setTimeout(function() {
       $('#connection_name').parent().removeClass('has-success');
     }, 1000);
-    connection_post(id, {friendly_name: value});
+    connection_post(identifier, {friendly_name: value});
   } else if (field == 'auto_accept') {
       value = parseInt($('input[name="auto_accept"]:radio:checked').val());
       render_limits_table(value == 1);
-      connection_post(id, {auto_accept: value});
+      connection_post(identifier, {auto_accept: value});
   }  else if (field == 'favorite') {
-    if ($('#connection_favorite').hasClass('glyphicon-star-empty')) {
-      //to become a favorite
-      $('#connection_favorite').removeClass('glyphicon-star-empty');
-      $('#connection_favorite').removeClass('text-muted');
-      $('#connection_favorite').addClass('glyphicon-star');
-      $('#connection_favorite').addClass('connections_yellow');
-      value = true;
-    } else {
-      //to become a non-favorite
-      $('#connection_favorite').addClass('glyphicon-star-empty');
-      $('#connection_favorite').addClass('text-muted');
-      $('#connection_favorite').removeClass('glyphicon-star');
-      $('#connection_favorite').removeClass('connections_yellow');
-      value = false;
-    }
-    connection_post(id, {favorite: value});
+    value = parseInt($('input[name="favorite"]:radio:checked').val());
+    connection_post(identifier, {favorite: value});
   }
 
 }
 
-function connection_remove_limit(id,currency) {
-  limit_post(id, currency, 0);
-  connection_load(id);
+function connection_remove_limit(identifier,currency) {
+  contactObj = contact_get_by_identifier(identifier);
+  if (contactObj != null && contactObj.limits != null && contactObj.limits[currency] != null) {
+    //so remove it, if it exists
+    delete contactObj.limits[currency]; //limits is a object literal (so dictionary), on which you can do delete, see http://stackoverflow.com/questions/8173210/delete-vs-splice-on-associative-array
+  }
+  connection_post(identifier, {limits: contactObj.limits});
+  connection_load(identifier);
 }
 
-function connection_post(id, payload) {
+function connection_remove_modal() {
+  $('#connectionRemoveModal').modal();
+}
+
+function connection_remove(identifier) {
+  $('#connectionRemoveModal').modal('hide');
+  contactIndex = contact_get_index_by_identifier(identifier);
+  if (contactIndex != null) {
+    contacts.splice([contactIndex],1); //remove only 1
+    connection_post(identifier, {identifier: ''});
+  }
+  document.location.hash = 'connections';
+}
+
+function connection_post(identifier, payload) {
   //Update local database
-  if (id in contacts) {
+  contactObj = contact_get_by_identifier(identifier);
+  if (contactObj != null) {
     $.each(payload, function(field, value) {
-      contacts[id][field] = value;
+      contactObj[field] = value;
     });
-    localStorage.setItem('user_contacts', JSON.stringify(contacts));
+    contacts_add_metadata();
   }
 
   //Propagate to API
   $.ajaxWrapper(
-    'contacts/'+id, //resource
+    'contacts/'+identifier, //resource
     'POST', //type
     true, //secure
     payload, //data,
-    false, //notification
-    {
-    } //ajax options
-  );
-}
-
-function limit_post(contact_id, currency, value) {
-  //Update local database
-  if (limits == null) limits = {};
-  if (!(contact_id in limits)) limits[contact_id] = {};
-
-  if (value > 0) {
-    limits[contact_id][currency] = value;
-  } else {;
-    delete limits[contact_id][currency];
-    value = 0;
-  }
-  add_limits_to_contacts();
-
-  //Propagate to API
-  $.ajaxWrapper(
-    'autolimits/'+contact_id+'/'+currency, //resource
-    'POST', //type
-    true, //secure
-    {auto_limit: value}, //data,
     false, //notification
     {
     } //ajax options

@@ -1,6 +1,6 @@
 function identifiers_load() {
   var compiledTemplate = Handlebars.getTemplate('identifiers');
-  $("#content").html(compiledTemplate({identifiers: identifiers}));
+  $("#content").html(compiledTemplate({identifiers: identifiers_format(identifiers)}));
 
   //Add listeners
   $('#identifiersAddIdentifierModal').on('shown.bs.modal', function (e) {
@@ -18,6 +18,49 @@ function identifiers_load() {
     $('#identifiersVerifyIdentifierModalToken').val('');
     $('#identifiersVerifyIdentifierModalToken').focus();
   })
+}
+
+function identifiers_format(identifiers) {
+  $.each(identifiers, function(i, identifier) {
+    if (identifier.primary == false && identifier.verified == true) {
+      identifier.verified_primary = false;
+      identifier.verified_not_primary = true; //Works, because of passing by reference
+    } else if (identifier.primary == true && identifier.verified == true) {
+      identifier.verified_primary = true;
+      identifier.verified_not_primary = false; //Works, because of passing by reference
+    } else {
+      identifier.verified_primary = false;
+      identifier.verified_not_primary = false; //Works, because of passing by reference
+    }
+  });
+	return identifiers;
+}
+
+
+function identifier_set_primary(identifierStr) {
+  //Change primary
+
+  //Propagate to API
+  $.ajaxWrapper(
+    'identifiers/default', //resource
+    'POST', //type
+    true, //secure
+    {identifier: identifierStr}, //data,
+    true, //notification
+    {
+      success: function(data){
+        $.each(identifiers, function(i, identifier) {
+          if (identifier.identifier == identifierStr) {
+            identifier.primary = true;
+          } else {
+            identifier.primary = false;
+          }
+        });
+
+        identifiers_load();
+      }
+    } //ajax options
+  );
 }
 
 //Add a new identifier
@@ -65,7 +108,6 @@ function identifiers_load() {
           success: function(data){
             //Update local database and refresh
             identifiers.push(data.data);
-            localStorage.setItem('user_identifiers', JSON.stringify(identifiers)); //TODO: get all localstorage to one place
             identifiers_load();
           }
         } //ajax options
@@ -134,7 +176,6 @@ function identifier_verify() {
         //Update local database and refresh
         identifiers = identifiers.filter(function(e){return e.identifier!==$('#identifiersVerifyIdentifierModalIdentifier').html()})
         identifiers.push(data.data);
-        localStorage.setItem('user_identifiers', JSON.stringify(identifiers)); //TODO: get all localstorage to one place
         identifiers_load();
         $.bootstrapGrowl('You have validated '+$('#identifiersChangePasswordModalIdentifier').html()+' successfully.', {'delay':2000, 'type':'success'});
       }
@@ -176,10 +217,16 @@ function identifier_remove() {
     true, //notification
     {
       success: function(data){
-        //Update local database and refresh
-        identifiers = identifiers.filter(function(e){return e.identifier!==$('#identifiersRemoveIdentifierModalIdentifier').html()})
-        localStorage.setItem('user_identifiers', JSON.stringify(identifiers)); //TODO: get all localstorage to one place
-        identifiers_load();
+        //refresh
+        if (identifiers.length == 1) {
+          //This was probably the last identifier, log out
+          $.bootstrapGrowl('Your account is now disabled, you will be logged out.', {'delay':4000, 'type':'success'});
+          logout(false);
+        } else {
+          //There are probably others, try that and stay logged in
+          settings_get(false, true);
+        }
+
       }
     } //ajax options
   );

@@ -1,16 +1,16 @@
 <ol class="breadcrumb">
   <li><a href="#settings">Settings</a></li>
-  <li class="active">Connections</li>
+  <li class="active">Contacts</li>
 </ol>
 
 {{#if connections}}
   <div class="list-group">
     {{#each connections}}
-      <a href="#connection/{{id}}" class="list-group-item">
+      <a href="#connection/{{primary_identifier}}" class="list-group-item">
         <div class="row">
           <div class="col-xs-9">
             <h5 class="list-group-item-heading">
-              {{#if friendly_name}}{{friendly_name}}{{else}}{{name}}{{/if}}
+              {{effective_name}}
             </h5>
             {{#each identifiers}}
               {{#if active}}<p class="list-group-item-text">{{identifier}}</p>{{/if}}
@@ -18,8 +18,7 @@
           </div>
           <div class="col-xs-3">
             <p class="text-right">
-              {{#if limits}}<span class="glyphicon glyphicon-transfer text-muted icon_size"></span>{{/if}}
-              {{#if favorite}}<span class="glyphicon glyphicon-star connections_yellow icon_size"></span>{{/if}}
+              {{#unless favorite}}<span class="glyphicon glyphicon-thumbs-down icon_size"></span>{{/unless}}
             </p>
           </div>
         </div>
@@ -31,3 +30,29 @@
 {{else}}
   <p>No contacts to display: you probably did not send or receive a memo yet.</p>
 {{/if}}
+
+<a href="javascript:connections_add();" class="btn btn-default">Add a new contact</a>
+
+<!-- Modals -->
+  <div class="modal" id="connectionsAddContactModal" tabindex="-1" role="dialog" aria-labelledby="connectionsAddContactModalTitle">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="connectionsAddContactModalTitle">Add contact</h4>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="connectionsAddContactModalEmail">Email address</label>
+              <input type="email" class="form-control" id="connectionsAddContactModalEmail" placeholder="Email">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <a href="javascript:connections_add_submit();" role="button" class="btn btn-primary">Add</a>
+        </div>
+      </div>
+    </div>
+  </div>

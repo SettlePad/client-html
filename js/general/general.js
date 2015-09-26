@@ -62,7 +62,7 @@ $(window).hashchange( function(){
 	var hash_split = hash.split("/");
 
 	menu_item = hash_split[0];
-	if (menu_item =='connections' || menu_item == 'profile') menu_item = 'settings';
+	if (menu_item =='connections' || menu_item == 'profile' || menu_item == 'connection' || menu_item == 'identifiers') menu_item = 'settings';
 
 	$("li[id^='menu_']").removeClass('active');
 	$('#menu_'+menu_item).addClass('active');
@@ -105,33 +105,15 @@ $(window).hashchange( function(){
 		} else if (hash_split[0] == 'balance') {
 			balance_currency(hash_split[1]);
 		} else if (hash == 'settings') {
-			settings();
+			settings_get(true,false);
 		} else if (hash == 'connections') {
-			contacts_get(true);
+			contacts_get(true,false);
 		} else if (hash == 'identifiers') {
-			identifiers_load();
+			settings_get(false,true);
 		} else if (hash_split[0] == 'connection'){
-			connection_load(hash_split[1]);
+			contacts_get(false,hash_split[1]);
 		} else if (hash == 'logout') {
-			$.ajaxWrapper(
-				'logout', //resource
-				'POST', //type
-				true, //secure
-				{}, //data,
-				false, //notification
-				{} //ajax options
-			);
-
-			//Clear local credentials independent of success of logout
-			Object.keys(localStorage).forEach(function(key){
-				if (/^user_/.test(key)) localStorage.removeItem(key); //kill all localstorage items starting with user_
-			});
-			contacts = {}; //dict
-			/*limits = {}; //dict
-			identifiers = []; //array*/
-
-			$("#content").html('');
-			document.location.hash = '';
+			logout(true);
 		} else {
 			//default
 			document.location.hash = 'balance';
@@ -159,7 +141,6 @@ $('#loginForm').submit(function() {
 				localStorage.setItem('user_id', data.user_id);
 				localStorage.setItem('user_name', data.user_name);
 				localStorage.setItem('user_default_currency', data.default_currency);
-				localStorage.setItem('user_identifiers', JSON.stringify(data.identifiers));
 				identifiers = data.identifiers;
 
 				$.bootstrapGrowl('Logged in', {'delay':2000, 'type':'success'});
@@ -249,6 +230,30 @@ function request_reset() {
 		);
 	}
 
+function logout(also_on_server) {
+	if (also_on_server) {
+		$.ajaxWrapper(
+			'logout', //resource
+			'POST', //type
+			true, //secure
+			{}, //data,
+			false, //notification
+			{} //ajax options
+		);
+	}
+
+	//Clear local credentials independent of success of logout
+	Object.keys(localStorage).forEach(function(key){
+		if (/^user_/.test(key)) localStorage.removeItem(key); //kill all localstorage items starting with user_
+	});
+	contacts = []; //dict
+	metadata_last_update = 0;
+	identifiers = []; //array*/
+
+	$("#content").html('');
+	document.location.hash = '';
+}
+
 //Format number
 	function number_format(number,decimals,show_sign) {
 		var decimal_sep = '.';
@@ -333,6 +338,7 @@ function request_reset() {
 		var pattern = new RegExp(/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i);
 		return pattern.test(emailAddress);
 	};
+
 
 //Currencies
 	var currencies = {

@@ -25,11 +25,11 @@ function send_load(){
 
   $('#sendform_to').on('paste', function () {
     setTimeout(function () {
-      if(!jQuery.isEmptyObject(contacts)) {
+      //if(!jQuery.isEmptyObject(contacts)) {
         $('#sendform_to').typeahead('val', $('#sendform_to').val().match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi) );
-      } else {
-        $('#sendform_to').val($('#sendform_to').val().match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi));
-      }
+      //} else {
+      //  $('#sendform_to').val($('#sendform_to').val().match(/([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi));
+      //}
     }, 100);
   });
 

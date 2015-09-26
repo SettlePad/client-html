@@ -9,7 +9,7 @@ function balance_currencies() {
 		true, //notification
 		{
 			success: function(data){
-				currencies = balance_format(data.data);
+				currencies = balance_format_multiple_currencies(data.data);
 				if (currencies !== undefined && currencies.length == 1) {
 					multiple_currencies = false;
 					balance_currency(currencies[0].currency);
@@ -33,7 +33,7 @@ function balance_currency(currency) {
 			success: function(data){
 				var compiledTemplate = Handlebars.getTemplate('balance_currency');
 				if (data.data.connections !== undefined) {
-					$("#content").html(compiledTemplate({selected_currency: currency, balaces: balance_format(data.data.summary[currency]), connections: balance_format(data.data.connections[currency].sort(balance_sort)), multiple_currencies: multiple_currencies}));
+					$("#content").html(compiledTemplate({selected_currency: currency, balances: balance_format(data.data.summary[currency]), connections: balance_format_connections(data.data.connections[currency].sort(balance_sort)), multiple_currencies: multiple_currencies}));
 				} else {
 					$("#content").html(compiledTemplate);
 				}
@@ -59,18 +59,24 @@ function balance_format(data) {
 			data.get_formatted = number_format(data.get,2,true);
 			data.get_active = data.get > 0;
 	}
+	return data;
+}
+
+function balance_format_multiple_currencies(data) {
 	for (index = 0; index < data.length; ++index) {
-		if (data[index].balance !== undefined) {
-				data[index].balance_formatted = number_format(data[index].balance,2,true);
-				data[index].balance_negative = data[index].balance < 0;
-		}
-		if (data[index].owe !== undefined) {
-				data[index].owe_formatted = number_format(data[index].owe,2,true);
-				data[index].owe_active = data[index].owe < 0;
-		}
-		if (data[index].get !== undefined) {
-				data[index].get_formatted = number_format(data[index].get,2,true);
-				data[index].get_active = data[index].get > 0;
+		data[index] = balance_format(data[index]);
+	}
+	return data;
+}
+
+function balance_format_connections(data) {
+	for (index = 0; index < data.length; ++index) {
+		data[index] = balance_format(data[index]);
+		//Check whether primary identifier is available in contact, so that we can replace name with effective_name
+		contactObj = contact_get_by_identifier(data[index].primary_identifier);
+		if (contactObj != null) {
+			data[index]['contact'] = true;
+			data[index]['name'] = contactObj.effective_name;
 		}
 	}
 	return data;

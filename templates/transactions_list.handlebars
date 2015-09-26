@@ -1,6 +1,6 @@
 {{#each transactions}}
-  <span onclick="transaction_toggle(this);" class="list-group-item cursor_pointer" id="transaction_{{transaction_id}}">
-    <span class="transactions_amount text-{{#if status_canceled}}muted{{else}}{{#if amount_negative}}danger{{else}}success{{/if}}{{/if}}">{{#if status_canceled}}<s>{{/if}}{{currency}} {{amount_formatted}}{{#if status_canceled}}</s>{{/if}}</span>
+  <span class="list-group-item" id="transaction_{{transaction_id}}">
+    <span class="transactions_amount text-{{#if status_canceled}}muted{{else}}{{#if amount_negative}}muted{{else}}success{{/if}}{{/if}}">{{#if status_canceled}}<s>{{/if}}{{currency}} {{amount_formatted}}{{#if status_canceled}}</s>{{/if}}</span>
     <h5 class="list-group-item-heading">{{#if status_canceled}}<s>{{/if}}{{description}}{{#if status_canceled}}</s>{{/if}} {{#if status_canceled}}<span class="label label-default">canceled</span>{{else}}{{#if status_pending}}<span class="label label-warning">not yet approved</span>{{else}}{{#unless reduced}} <span class="label label-info">queued</span> {{/unless}}{{/if}}{{/if}}</h5>
     {{#if can_accept}}
       <span class="list_group_action_right">
@@ -11,14 +11,6 @@
     {{#if can_cancel}}
       <a href="javascript:transaction_accept({{transaction_id}}, 'cancel');" class="list_group_action_right">cancel</a>
     {{/if}}
-    <div class="transaction_anti_toggle">
-      <p class="list-group-item-text">{{#if status_canceled}}<s>{{/if}}{{#if is_sender}}To{{else}}From{{/if}} {{counterpart_name}}{{#unless recipient_registered}} (not registered){{/unless}}, {{time_sent_humane}}{{#if status_canceled}}</s>{{/if}}</p>
-    </div>
-    <div class="hidden transaction_toggle">
-      <p class="list-group-item-text">{{#if is_sender}}To{{else}}From{{/if}}: {{counterpart_name}} {{#unless recipient_registered}}(not registered){{/unless}} ({{counterpart_id}})</p>
-      <p class="list-group-item-text">Time sent: {{time_sent_formatted}}</p>
-      <p class="list-group-item-text">Status: {{#if status_pending}}Approval pending, not accounted for in balance{{/if}}{{#if status_canceled}}Canceled{{/if}}</p>
-      <p class="list-group-item-text">ID: {{transaction_id}}</p>
-    </div>
+    <p class="list-group-item-text">{{#if status_canceled}}<s>{{/if}}{{#if is_sender}}To{{else}}From{{/if}} {{#if contact}}<a href="#connection/{{counterpart_primary_identifier}}">{{/if}}{{counterpart_name}}{{#if contact}}</a>{{/if}}{{#unless recipient_registered}} (not registered){{/unless}}, {{time_sent_humane}}{{#if status_canceled}}</s>{{/if}}</p>
   </span>
 {{/each}}

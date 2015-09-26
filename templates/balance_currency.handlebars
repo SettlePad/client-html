@@ -12,7 +12,7 @@
       <tbody>
         {{#each connections}}
           <tr>
-          <td>{{name}} {{#if unprocessed}}<span class="label label-info">queued</span> {{/if}}</td>
+          <td>{{#if contact}}<a href="#connection/{{primary_identifier}}">{{/if}}{{name}}{{#if contact}}</a>{{/if}} {{#if unprocessed}}<span class="label label-info">queued</span> {{/if}}</td>
           <td class="text_right">{{#if balance_negative}}<span class="text-danger">{{balance_formatted}}</span>{{/if}}</td>
           <td class="text_right">{{#unless balance_negative}}<span class="text-success">{{balance_formatted}}</span>{{/unless}}</td>
           <!-- <td class="text_right"><span class="text-{{#if balance_negative}}danger{{else}}success{{/if}}">{{balance_formatted}}</span></td> -->
@@ -20,15 +20,15 @@
         {{/each}}
         <tr class="active text_bold">
           <td>Sum</td>
-          <td class="text_right"><span class="text-danger">{{#if balaces.owe_active}}{{balaces.owe_formatted}}{{/if}}</span></td>
-          <td class="text_right"><span class="text-success">{{#if balaces.get_active}}{{balaces.get_formatted}}{{/if}}</span></td>
-          <!-- <td class="text_right"><span class="text-{{#if balaces.balance_negative}}danger{{else}}success{{/if}}">{{balaces.balance_formatted}}</span></td> -->
+          <td class="text_right"><span class="text-danger">{{#if balances.owe_active}}{{balances.owe_formatted}}{{/if}}</span></td>
+          <td class="text_right"><span class="text-success">{{#if balances.get_active}}{{balances.get_formatted}}{{/if}}</span></td>
+          <!-- <td class="text_right"><span class="text-{{#if balances.balance_negative}}danger{{else}}success{{/if}}">{{balances.balance_formatted}}</span></td> -->
         </tr>
         <tr class="text_bold">
           <td>Balance</td>
-          <td class="text_right"><span class="text-danger">{{#if balaces.balance_negative}}{{balaces.balance_formatted}}{{/if}}</span></td>
-          <td class="text_right"><span class="text-success">{{#unless balaces.balance_negative}}{{balaces.balance_formatted}}{{/unless}}</span></td>
-          <!-- <td class="text_right"><span class="text-{{#if balaces.balance_negative}}danger{{else}}success{{/if}}">{{balaces.balance_formatted}}</span></td> -->
+          <td class="text_right"><span class="text-danger">{{#if balances.balance_negative}}{{balances.balance_formatted}}{{/if}}</span></td>
+          <td class="text_right"><span class="text-success">{{#unless balances.balance_negative}}{{balances.balance_formatted}}{{/unless}}</span></td>
+          <!-- <td class="text_right"><span class="text-{{#if balances.balance_negative}}danger{{else}}success{{/if}}">{{balances.balance_formatted}}</span></td> -->
         </tr>
       </tbody>
      </table>

@@ -9,7 +9,7 @@
       <li class="list-group-item">
         <div class="row">
           <div class="col-xs-9">
-            {{identifier}}
+            {{identifier}} {{#if verified_primary}}<span class="glyphicon glyphicon-ok text-success"></span>{{/if}}
           </div>
           <div class="col-xs-3 text-right more-button-div">
             <div class="dropdown">
@@ -23,6 +23,9 @@
                   <li><a href="javascript:identifier_verify_modal('{{identifier}}');">Enter verification code</a></li>
                   <li><a href="javascript:identifier_resend_verification_code('{{identifier}}');">Resend verification code</a></li>
                 {{/unless}}
+                {{#if verified_not_primary}}
+                  <li><a href="javascript:identifier_set_primary('{{identifier}}');">Set as primary identifier</a></li>
+                {{/if}}
                 <li><a href="javascript:identifier_remove_modal('{{identifier}}');" class="dropdown_danger">Delete</a></li>
               </ul>
             </div>
