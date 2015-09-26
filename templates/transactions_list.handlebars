@@ -11,6 +11,6 @@
     {{#if can_cancel}}
       <a href="javascript:transaction_accept({{transaction_id}}, 'cancel');" class="list_group_action_right">cancel</a>
     {{/if}}
-    <p class="list-group-item-text">{{#if status_canceled}}<s>{{/if}}{{#if is_sender}}To{{else}}From{{/if}} {{#if contact}}<a href="#connection/{{counterpart_primary_identifier}}">{{/if}}{{counterpart_name}}{{#if contact}}</a>{{/if}}{{#unless recipient_registered}} (not registered){{/unless}}, {{time_sent_humane}}{{#if status_canceled}}</s>{{/if}}</p>
+    <p class="list-group-item-text">{{#if status_canceled}}<s>{{/if}}{{#if is_sender}}To{{else}}From{{/if}} {{#if contact}}<a href="#connection/{{counterpart_primary_identifier}}">{{/if}}{{counterpart_name}}{{#if contact}}</a>{{/if}}{{#if recipient_registered}}<!--({{counterpart_used_identifier}})-->{{else}} (not registered){{/if}}, {{time_sent_humane}}{{#if status_canceled}}</s>{{/if}}</p>
   </span>
 {{/each}}

@@ -12,7 +12,7 @@
       <tbody>
         {{#each connections}}
           <tr>
-          <td>{{#if contact}}<a href="#connection/{{primary_identifier}}">{{/if}}{{name}}{{#if contact}}</a>{{/if}} {{#if unprocessed}}<span class="label label-info">queued</span> {{/if}}</td>
+          <td>{{#if contact}}<a href="#connection/{{primary_identifier}}">{{/if}}{{name}}{{#if contact}}</a>{{/if}} {{#unless favorite}}<span class="glyphicon glyphicon-thumbs-down"></span>{{/unless}} {{#if unprocessed}}<span class="label label-info">queued</span> {{/if}}</td>
           <td class="text_right">{{#if balance_negative}}<span class="text-danger">{{balance_formatted}}</span>{{/if}}</td>
           <td class="text_right">{{#unless balance_negative}}<span class="text-success">{{balance_formatted}}</span>{{/unless}}</td>
           <!-- <td class="text_right"><span class="text-{{#if balance_negative}}danger{{else}}success{{/if}}">{{balance_formatted}}</span></td> -->

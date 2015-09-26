@@ -8,8 +8,11 @@ function connections_load() {
 //Show modal
 function connections_add() {
   $('#connectionsAddContactModal').modal();
-  $('#connectionsAddContactModalEmail').focus();
 }
+
+$('#connectionsAddContactModal').on('shown.bs.modal', function (e) {
+  $('#connectionsAddContactModalEmail').focus();
+})
 
 //Process submit
 function connections_add_submit() {

@@ -84,11 +84,25 @@ $(window).hashchange( function(){
 
 	if (localStorage.getItem('user_id') === null) {
 		//Not logged in
-		$('#loginEmail').val("");
-		$('#loginPassword').val("");
-		$('#username_top').html("");
-		$('#username_left').html("");
-		$('#loginModal').modal({keyboard: false, backdrop: 'static'});
+		if (hash_split[0] == 'register') {
+			$('.modal').modal('hide'); //Hide all modals
+			$('#registerModalName').val("");
+			$('#registerModalEmail').val("");
+			$('#registerModalPassword').html("");
+			$('#registerModal').modal({keyboard: false, backdrop: 'static'});
+		} else if (hash_split[0] == 'verify') {
+			$('.modal').modal('hide'); //Hide all modals
+			$('#verifyIdentifierModalToken').html("");
+			$('#verifyIdentifierModalIdentifier').html(hash_split[1]);
+			$('#verifyIdentifierModal').modal({keyboard: false, backdrop: 'static'});
+		} else {
+			$('.modal').modal('hide'); //Hide all modals
+			$('#loginEmail').val("");
+			$('#loginPassword').val("");
+			$('#username_top').html("");
+			$('#username_left').html("");
+			$('#loginModal').modal({keyboard: false, backdrop: 'static'});
+		}
 	} else {
 		//Logged in
 		$('#username_top').html(localStorage.getItem('user_name'));
@@ -125,6 +139,14 @@ $('#loginModal').on('shown.bs.modal', function (e) {
 	$('#loginEmail').focus();
 })
 
+$('#registerModal').on('shown.bs.modal', function (e) {
+	$('#registerModalName').focus();
+})
+
+$('#verifyIdentifierModal').on('shown.bs.modal', function (e) {
+	$('#verifyIdentifierModalToken').focus();
+})
+
 //Catch the login form submit
 $('#loginForm').submit(function() {
 	//do login
@@ -149,24 +171,68 @@ $('#loginForm').submit(function() {
 			},
 			error: function(xhr, errorType, exception) {
 				//revert
-				pwd_incorrect = false;
 				var error_data = $.parseJSON(xhr.responseText);
-				if (error_data.error.code == 'incorrect_credentials') pwd_incorrect = true;
-				if (pwd_incorrect) {
+				if (error_data.error.code == 'incorrect_credentials') {
 					$('#loginModal').modal('hide');
 					//$('#loginModal').on('hidden.bs.modal', function (e) {
-						$('#requestPasswordResetModal').modal({keyboard: false, backdrop: 'static'});
-						$('#requestPasswordResetModal').on('hidden.bs.modal', function (e) {
-							$('#loginModal').modal({keyboard: false, backdrop: 'static'});
-						});
+					$('#requestPasswordResetModal').modal({keyboard: false, backdrop: 'static'});
+					$('#requestPasswordResetModal').on('hidden.bs.modal', function (e) {
+						$('#loginModal').modal({keyboard: false, backdrop: 'static'});
+					});
 					//});
-
-				} else {
-					$.bootstrapGrowl(error_data.error.text, {'delay':2000, 'type':'danger'});
+				} else if (error_data.error.code == 'not_validated') {
+					document.location.hash = 'verify/'+$('#loginEmail').val();
 				}
 			}
 		} //ajax options
 		);
+	return false;
+});
+
+$('#registerForm').submit(function() {
+	//register new account
+	$.ajaxWrapper(
+		'register/account', //resource
+		'POST', //type
+		false, //secure
+		{identifier: $('#registerModalEmail').val(), name: $('#registerModalName').val(), password: $('#registerModalPassword').val(), type: 'email', 'primary_currency': 'EUR'}, //data,
+		true, //notification
+		{
+			success: function(data){
+				$.bootstrapGrowl('Account created. Check your inbox for a validation code', {'delay':2000, 'type':'success'});
+				$('#loginEmail').val($('#registerModalEmail').val());
+				$('#loginPassword').val($('#registerModalPassword').val());
+				document.location.hash = 'verify/'+$('#registerModalEmail').val();
+			}
+		} //ajax options
+		);
+	return false;
+});
+
+$('#verifyForm').submit(function() {
+  //Propagate to API
+  $.ajaxWrapper(
+    'register/verify/', //resource
+    'POST', //type
+    false, //secure
+    {identifier: $('#verifyIdentifierModalIdentifier').html(), token: $('#verifyIdentifierModalToken').val()}, //data,
+    true, //notification
+    {
+      success: function(data){
+				if ($('#loginEmail').val() != '' && $('#loginPassword').val() != '') {
+					//We came here via registerForm and can log in directly
+					$('.modal').modal('hide'); //Hide all modals
+					$('#loginForm').submit();
+				} else {
+					//We came here via url, show login form
+					$.bootstrapGrowl('Token validated. Now log in please', {'delay':2000, 'type':'success'});
+					$('.modal').modal('hide'); //Hide all modals
+					document.location.hash = '';
+				}
+
+      }
+    } //ajax options
+  );
 	return false;
 });
 

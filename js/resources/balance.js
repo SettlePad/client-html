@@ -77,6 +77,9 @@ function balance_format_connections(data) {
 		if (contactObj != null) {
 			data[index]['contact'] = true;
 			data[index]['name'] = contactObj.effective_name;
+			data[index]['favorite'] = contactObj.favorite;
+		} else {
+			data[index]['favorite'] = 0;
 		}
 	}
 	return data;

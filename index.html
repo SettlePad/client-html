@@ -71,33 +71,17 @@
   	  <div class="modal-dialog">
     		<div class="modal-content">
     		  <div class="modal-header">
-    			  <h4 class="modal-title" id="loginModalLabel">Please login or register</h4>
+    			  <h4 class="modal-title" id="loginModalLabel">Login to SettlePad</h4>
     		  </div>
     		  <div class="modal-body">
-    		  	<h4>Login<!-- with email and password--></h4>
-      			<form class="form-inline" id="loginForm" role="form">
-      			  <div class="form-group">
-      				      <label class="sr-only" for="loginEmail">Email address</label>
-      				      <input type="email" class="form-control" id="loginEmail" placeholder="Email address">
-      			  </div>
-      			  <div class="form-group">
-      				      <label class="sr-only" for="loginPassword">Password</label>
-      				      <input type="password" class="form-control" id="loginPassword" placeholder="Password">
-      			  </div>
-      			  <button type="submit" class="btn btn-primary">Sign in</button>
-              <!--<button type="button" class="btn btn-default">Sign up</button>-->
-      			</form>
-
-            <hr>
-            <h4>About SettlePad</h4>
-            <p>SettlePad keeps track of your IOUs and UOmes. Our algorithm minimizes your receivables by canceling them out against your payables where possible.</p>
+            <!-- <p>SettlePad keeps track of your IOUs and UOmes. Our algorithm minimizes your receivables by canceling them out against your payables where possible.</p>
 
             <p>Your receivables are allocated as much as possible to your favorite connections. So you can pay beer for A (who is a lousy debtor) and get it back from B!</p>
 
-            <!-- <p>You can access SettlePad via the web, the iOS app or through our open API. -->
-            <p>SettlePad is currently in private beta. Only private beta users of the iOS app and former Memodude users can login.</p>
-            <!-- <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
-              //Indicators
+            <p>You can access SettlePad via the web, the iOS app or through our open API.
+            <p>SettlePad is currently in private beta. Only private beta users of the iOS app and former Memodude users can login.</p> -->
+            <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+              <!--Indicators -->
               <ol class="carousel-indicators">
                 <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
                 <li data-target="#carousel-example-generic" data-slide-to="1"></li>
@@ -105,7 +89,7 @@
                 <li data-target="#carousel-example-generic" data-slide-to="3"></li>
               </ol>
 
-              //Wrapper for slides
+              <!--Wrapper for slides-->
               <div class="carousel-inner" role="listbox">
                 <div class="item active">
                   <img src="http://placehold.it/700x350/08aceb/&text=placeholder" alt="aa">
@@ -133,7 +117,7 @@
                 </div>
               </div>
 
-              //Controls
+              <!--Controls-->
               <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
                 <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
                 <span class="sr-only">Previous</span>
@@ -142,11 +126,78 @@
                 <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                 <span class="sr-only">Next</span>
               </a>
-            </div> -->
+            </div>
+            <hr>
+
+            <form class="form-inline" id="loginForm" role="form">
+              <div class="form-group">
+                    <label class="sr-only" for="loginEmail">Email address</label>
+                    <input type="email" class="form-control" id="loginEmail" placeholder="Email address">
+              </div>
+              <div class="form-group">
+                    <label class="sr-only" for="loginPassword">Password</label>
+                    <input type="password" class="form-control" id="loginPassword" placeholder="Password">
+              </div>
+              <button type="submit" class="btn btn-primary">Sign in</button>
+              <a href="#register" class="btn btn-default" role="button">Sign up</a>
+            </form>
+
           </div>
     		</div><!-- /.modal-content -->
   	  </div><!-- /.modal-dialog -->
   	</div><!-- /.modal -->
+
+    <div class="modal fade" id="registerModal" tabindex="-1">
+  	  <div class="modal-dialog">
+    		<div class="modal-content">
+    		  <div class="modal-header">
+    			  <h4 class="modal-title" id="registerModalLabel">Please register</h4>
+    		  </div>
+    		  <div class="modal-body">
+            <form id="registerForm" role="form">
+              <div class="form-group">
+                <label for="registerModalName">Name</label>
+                <input type="text" class="form-control" id="registerModalName" placeholder="Name">
+              </div>
+              <div class="form-group">
+                <label for="registerModalEmail">Email address</label>
+                <input type="email" class="form-control" id="registerModalEmail" placeholder="Email">
+              </div>
+              <div class="form-group">
+                <label for="registerModalPassword">Password</label>
+                <input type="password" class="form-control" id="registerModalPassword" placeholder="Password">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <a href="#" role="button" class="btn btn-default">Cancel</a>
+            <a href="javascript:$('#registerForm').submit();" role="button" class="btn btn-primary">Register</a>
+          </div>
+    		</div><!-- /.modal-content -->
+  	  </div><!-- /.modal-dialog -->
+  	</div><!-- /.modal -->
+
+    <div class="modal fade" id="verifyIdentifierModal" tabindex="-1" role="dialog" aria-labelledby="verifyIdentifierModalTitle">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="verifyIdentifierModalTitle">Verify <span id="verifyIdentifierModalIdentifier"></span></h4>
+          </div>
+          <div class="modal-body">
+            <form id="verifyForm" role="form">
+              <div class="form-group">
+                <label for="verifyIdentifierModalToken">Token</label>
+                <input type="text" class="form-control" id="verifyIdentifierModalToken" placeholder="Enter the token you received via email">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <a href="#" role="button" class="btn btn-default">Cancel</a>
+            <a href="javascript:$('#verifyForm').submit();" role="button" class="btn btn-primary">Verify</a>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="modal fade" id="requestPasswordResetModal" tabindex="-1" role="dialog" aria-labelledby="requestPasswordResetModalTitle">
       <div class="modal-dialog" role="document">

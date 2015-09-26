@@ -67,34 +67,38 @@ function contacts_get(show_connections, show_connection_identifier) {
 function contact_get_by_identifier(identifierStr) {
 	//Get contact for identifierStr
 	var retval = null;
-	$.each(contacts, function(i, contact) {
-		if (contact.identifiers != null) {
-			$.each(contact.identifiers, function(j, identifierObj) {
-				//console.log(identifierObj.identifier);
-				if (identifierObj.identifier == identifierStr && identifierObj.active == true) {
-					retval = contact;
-					return false; //so get out of loop
-				}
-			});
-		}
-		if (retval != null) return false; //get out of loop
-	});
+	if (contacts != null && contacts.length > 0) {
+		$.each(contacts, function(i, contact) {
+			if (contact.identifiers != null) {
+				$.each(contact.identifiers, function(j, identifierObj) {
+					//console.log(identifierObj.identifier);
+					if (identifierObj.identifier == identifierStr && identifierObj.active == true) {
+						retval = contact;
+						return false; //so get out of loop
+					}
+				});
+			}
+			if (retval != null) return false; //get out of loop
+		});
+	}
 	return retval;
 }
 
 function contact_get_index_by_identifier(identifierStr) {
 	//Get contact for identifierStr
 	var retval = null;
-	$.each(contacts, function(i, contact) {
-		$.each(contact.identifiers, function(j, identifierObj) {
-			//console.log(identifierObj.identifier);
-			if (identifierObj.identifier == identifierStr && identifierObj.active == true) {
-				retval = i;
-				return false; //so get out of loop
-			}
+	if (contacts != null && contacts.length > 0) {
+		$.each(contacts, function(i, contact) {
+			$.each(contact.identifiers, function(j, identifierObj) {
+				//console.log(identifierObj.identifier);
+				if (identifierObj.identifier == identifierStr && identifierObj.active == true) {
+					retval = i;
+					return false; //so get out of loop
+				}
+			});
+			if (retval != null) return false; //get out of loop
 		});
-		if (retval != null) return false; //get out of loop
-	});
+	}
 	return retval;
 }
 
