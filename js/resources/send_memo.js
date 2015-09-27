@@ -156,12 +156,14 @@ function send_send() {
       {
         success: function(data){
           if (data.data !== null) {
+            transactions_search = '';
             document.location.hash = 'transactions';
 
             //reset send list
             send_list = []; //array of memos
             send_list_id = 0;
 
+            contacts_get(false,false);
             $.bootstrapGrowl('Memo sent. Not right? You can cancel them for 5 minutes.', {'delay':2000, 'type':'success'});
           }
 
