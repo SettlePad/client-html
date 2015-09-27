@@ -107,15 +107,18 @@ function contacts_add_metadata() {
 
 	if (contacts.length > 0) {
 		$.each(contacts, function(i, contact) {
-			if (contact.friendly_name != null && contact.friendly_name != '') {
-				contact.effective_name = contact.friendly_name;
-			} else {
-				contact.effective_name = contact['name'];
-			}
 			$.each(contact.identifiers, function(j, identifier) {
 				contact.primary_identifier = identifier.identifier; //Actually not the primary one per se, but at least an active one
 				return false; //1 is enough
 			});
+
+			if (contact.friendly_name != null && contact.friendly_name != '') {
+				contact.effective_name = contact.friendly_name;
+			} else if (contact['name'] != null){
+				contact.effective_name = contact['name'];
+			} else {
+				contact.effective_name = contact['primary_identifier'];
+			}
 		});
 	}
 	if (contacts.length > 1) {
