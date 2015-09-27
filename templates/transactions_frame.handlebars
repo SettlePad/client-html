@@ -1,7 +1,7 @@
 <form role="form" id="transactions_searchform">
 	<div class="form-group has-feedback">
 		<input type="text" class="form-control" placeholder="Search" id="transactions_searchinput" value="{{search}}">
-		<a href="javascript:transaction_search();"><span class="glyphicon glyphicon-search form-control-feedback form-feedback-no-label"></span></a>
+		<a href="javascript:transaction_search(false);"><span class="glyphicon glyphicon-search form-control-feedback form-feedback-no-label"></span></a>
 	</div>
 </form>
 {{#if transactions_present}}

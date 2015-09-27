@@ -16,11 +16,7 @@
       <label class="col-sm-2 control-label">Email address(es)</label>
       <div class="col-sm-8">
         {{#each connection.identifiers}}
-          {{#if active}}
-            <p class="form-control-static">{{identifier}}</p>
-          {{else}}
-            <p class="form-control-static"><s>{{identifier}}</s></p>
-          {{/if}}
+          <p class="form-control-static">{{identifier}}</p>
         {{/each}}
 
       </div>
@@ -96,6 +92,12 @@
           </ul>
           <span class="help-block">SettlePad will automatically accept incoming memos until the sum of the last 24 hours crosses the specified (positive) limit.</span>
         </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Transactions</label>
+      <div class="col-sm-8">
+        <p class="form-control-static"><a href="javascript:transaction_search('with:{{../connection.primary_identifier}}');">Show transactions with {{#if connection}}{{connection.effective_name}}{{/if}}</a></p>
       </div>
     </div>
     <div class="form-group" id="connection_delete_group">

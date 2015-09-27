@@ -72,7 +72,7 @@ function contact_get_by_identifier(identifierStr) {
 			if (contact.identifiers != null) {
 				$.each(contact.identifiers, function(j, identifierObj) {
 					//console.log(identifierObj.identifier);
-					if (identifierObj.identifier == identifierStr && identifierObj.active == true) {
+					if (identifierObj.identifier == identifierStr) {
 						retval = contact;
 						return false; //so get out of loop
 					}
@@ -91,7 +91,7 @@ function contact_get_index_by_identifier(identifierStr) {
 		$.each(contacts, function(i, contact) {
 			$.each(contact.identifiers, function(j, identifierObj) {
 				//console.log(identifierObj.identifier);
-				if (identifierObj.identifier == identifierStr && identifierObj.active == true) {
+				if (identifierObj.identifier == identifierStr) {
 					retval = i;
 					return false; //so get out of loop
 				}
@@ -113,10 +113,8 @@ function contacts_add_metadata() {
 				contact.effective_name = contact['name'];
 			}
 			$.each(contact.identifiers, function(j, identifier) {
-				if (identifier.active == true) {
-					contact.primary_identifier = identifier.identifier; //Actually not the primary one per se, but at least an active one
-					return false; //1 is enough
-				}
+				contact.primary_identifier = identifier.identifier; //Actually not the primary one per se, but at least an active one
+				return false; //1 is enough
 			});
 		});
 	}

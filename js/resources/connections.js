@@ -11,27 +11,29 @@ function connections_add() {
 }
 
 $('#connectionsAddContactModal').on('shown.bs.modal', function (e) {
-  $('#connectionsAddContactModalEmail').focus();
+  $('#connectionsAddContactModalEmail').focus(); //TODO: doesn't work?
 })
 
 //Process submit
-function connections_add_submit() {
+function connections_add_submit(identifierStr) {
   is_valid = true;
-  if (!isValidEmailAddress($('#connectionsAddContactModalEmail').val())) {
-      $('#connectionsAddContactModalEmail').focus();
-      is_valid = false;
-      $('#connectionsAddContactModalEmail').parent().addClass('has-error');
+  if (identifierStr == false) {
+    if (!isValidEmailAddress($('#connectionsAddContactModalEmail').val())) {
+        $('#connectionsAddContactModalEmail').focus();
+        is_valid = false;
+        $('#connectionsAddContactModalEmail').parent().addClass('has-error');
+    } else {
+        $('#connectionsAddContactModalEmail').parent().removeClass('has-error');
+        identifierStr = $('#connectionsAddContactModalEmail').val();
+        $('#connectionsAddContactModal').modal('hide');
+    }
   } else {
-      $('#connectionsAddContactModalEmail').parent().removeClass('has-error');
+    is_valid = isValidEmailAddress(identifierStr);
   }
   if (is_valid) {
-    //hide
-    emailVal = $('#connectionsAddContactModalEmail').val();
-    $('#connectionsAddContactModal').modal('hide');
-
     //Propagate to API
     $.ajaxWrapper(
-      'contacts/'+emailVal, //resource
+      'contacts/'+identifierStr, //resource
       'POST', //type
       true, //secure
       {favorite: 1, auto_accept: 0, friendly_name: ''}, //data,
@@ -39,7 +41,7 @@ function connections_add_submit() {
       {
         success: function(data){
           //Refresh local database and show settings
-          document.location.hash = 'connection/'+emailVal;
+          document.location.hash = 'connection/'+identifierStr;
           //contacts_get(false, emailVal);
         }
       } //ajax options
