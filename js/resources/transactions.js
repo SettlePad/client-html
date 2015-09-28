@@ -1,8 +1,10 @@
 transaction_max_request =20;
 transactions_search = '';
-function transactions_init() {
+transactions_group = 'open';
+function transactions_init(group) {
+  if (group != null && group != '') transactions_group = group;
   $.ajaxWrapper(
-    'transactions/initial/'+transaction_max_request+'/'+encodeURIComponent(transactions_search)+'/', //resource
+    'transactions/initial/'+transaction_max_request+'/'+transactions_group+'/'+encodeURIComponent(transactions_search)+'/', //resource
     'GET', //type
     true, //secure
     {}, //data,
@@ -26,6 +28,10 @@ function transactions_init() {
           $("#content").html(compiledTemplate({transactions_present: false, search: transactions_search}));
         }
 
+        //Activate correct group pill
+        $("li[id^='transactions_group_']").removeClass('active');
+        $("#transactions_group_"+transactions_group).addClass('active');
+
         //Catch the search form submit
         $('#transactions_searchform').submit(function() {
           transaction_search(false);
@@ -43,7 +49,7 @@ function transactions_older() {
     $("#transactions_load_loader").removeClass('hidden'); //Show AJAX loader ball
     $("#transactions_load_button").addClass('hidden'); //Hide load more button
     $.ajaxWrapper(
-      'transactions/older/'+transactions_oldest_id+'/'+transaction_max_request+'/'+encodeURIComponent(transactions_search)+'/', //resource
+      'transactions/older/'+transactions_oldest_id+'/'+transaction_max_request+'/'+transactions_group+'/'+encodeURIComponent(transactions_search)+'/', //resource
       'GET', //type
       true, //secure
       {}, //data,
@@ -71,7 +77,7 @@ function transactions_older() {
 
 function transactions_newer() {
   $.ajaxWrapper(
-    'transactions/newer/'+transactions_newest_id+'/'+transaction_max_request+'/'+encodeURIComponent(transactions_search)+'/', //resource
+    'transactions/newer/'+transactions_newest_id+'/'+transaction_max_request+'/'+transactions_group+'/'+encodeURIComponent(transactions_search)+'/', //resource
     'GET', //type
     true, //secure
     {}, //data,
@@ -88,7 +94,7 @@ function transactions_newer() {
 
 function transactions_update() {
   $.ajaxWrapper(
-    'transactions/updates/'+transactions_oldest_id+'/'+transactions_newest_id+'/'+transactions_last_update+'/'+encodeURIComponent(transactions_search)+'/', //resource
+    'transactions/updates/'+transactions_oldest_id+'/'+transactions_newest_id+'/'+transactions_last_update+'/'+transactions_group+'/'+encodeURIComponent(transactions_search)+'/', //resource
     'GET', //type
     true, //secure
     {}, //data,
@@ -170,10 +176,11 @@ function element_in_scroll(elem) {
 function transaction_search(searchStr) {
   if (searchStr == false) {
     transactions_search = $('#transactions_searchinput').val();
-    transactions_init();
+    transactions_init(false);
   } else {
     //Only call from outside of transactions, otherwise hash will not change
     transactions_search = searchStr;
+    transactions_group = 'all';
     document.location.hash = 'transactions';
   }
 

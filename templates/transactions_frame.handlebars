@@ -1,9 +1,21 @@
+<div class="well well-sm">
+	<ul class="nav nav-pills nav-justified">
+	  <li role="presentation" id="transactions_group_open"><a href="#transactions/open">Open and queued <span class="badge">x</span></a></li>
+	  <li role="presentation" id="transactions_group_processed"><a href="#transactions/processed">Processed</a></li>
+	  <li role="presentation" id="transactions_group_canceled"><a href="#transactions/canceled">Canceled</a></li>
+		<li role="presentation" id="transactions_group_all"><a href="#transactions/all">All</a></li>
+	</ul>
+</div>
+
+
 <form role="form" id="transactions_searchform">
 	<div class="form-group has-feedback">
 		<input type="text" class="form-control" placeholder="Search" id="transactions_searchinput" value="{{search}}">
 		<a href="javascript:transaction_search(false);"><span class="glyphicon glyphicon-search form-control-feedback form-feedback-no-label"></span></a>
 	</div>
 </form>
+
+
 {{#if transactions_present}}
 	<div class="list-group" id="transactions_list"></div>
 	<div class="center-block text_center" id="transactions_load_button">

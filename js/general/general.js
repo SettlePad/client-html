@@ -111,7 +111,7 @@ $(window).hashchange( function(){
 
 		if (hash_split[0] == 'transactions') {
 			search = '';
-			transactions_init();
+			transactions_init(hash_split[1]);
 		} else if (hash == 'send') {
 			send_load();
 		} else if (hash == 'balance') {
