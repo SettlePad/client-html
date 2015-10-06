@@ -1,8 +1,8 @@
 <div class="well well-sm">
 	<ul class="nav nav-pills nav-justified">
-	  <li role="presentation" id="transactions_group_open"><a href="#transactions/open">Open and queued <span class="badge">x</span></a></li>
-	  <li role="presentation" id="transactions_group_processed"><a href="#transactions/processed">Processed</a></li>
-	  <li role="presentation" id="transactions_group_canceled"><a href="#transactions/canceled">Canceled</a></li>
+	  <li role="presentation" id="transactions_group_open"><a href="#transactions/open">Open and queued <span class="badge">{{#if unread_open}}{{unread_open}}{{/if}}</span></a></li>
+	  <li role="presentation" id="transactions_group_processed"><a href="#transactions/processed">Done <span class="badge">{{#if unread_processed}}{{unread_processed}}{{/if}}</span></a></li>
+	  <li role="presentation" id="transactions_group_canceled"><a href="#transactions/canceled">Canceled <span class="badge">{{#if unread_canceled}}{{unread_canceled}}{{/if}}</span></a></li>
 		<li role="presentation" id="transactions_group_all"><a href="#transactions/all">All</a></li>
 	</ul>
 </div>

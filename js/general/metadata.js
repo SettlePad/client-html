@@ -1,15 +1,26 @@
 //Metadata: contacts and identifiers
 var contacts = []; //array
-var metadata_last_update = 0;
 var identifiers = []; //array
+var transaction_status = {latest: null, open: 0, unread: {open: 0, processed: 0, canceled: 0}};
 
-function sync_metadata_if_needed(){
-	if (metadata_last_update < (moment().unix() - 60*60)) {
-		//update if not present, otherwise every hour. Note that every time the website gets refreshed, everything will be reloaded!
-		contacts_get(false,false);
-		settings_get(false,false);
-		metadata_last_update = moment().unix();
-	}
+function sync_metadata(){
+		//update now and at regular intervals. Note that every time the website gets refreshed, everything will be reloaded!
+		sync_metadata_now();
+
+		setInterval(function(){
+			contacts_get(false,false);
+			settings_get(false,false);
+		}, 60*60*1000); //every hour
+
+		setInterval(function(){
+			poll_status();
+		}, 2*60*1000); //every two minutes
+}
+
+function sync_metadata_now(){
+	poll_status();
+	contacts_get(false,false);
+	settings_get(false,false);
 }
 
 function settings_get(show_settings, show_identifiers) {
@@ -128,4 +139,53 @@ function contacts_add_metadata() {
 			return 0;
 		});
 	}
+}
+
+function poll_status() {
+	$.ajaxWrapper(
+		'status', //resource
+		'GET', //type
+		true, //secure
+		{}, //data,
+		false, //notification
+		{
+			success: function(data){
+				if (transaction_status.last_update == null || transaction_status.last_update < moment(data['latest'])) {
+					transaction_status.last_update = moment(data['latest']);
+					transaction_status.open = data.open;
+					transaction_status.unread = data.unread;
+
+					var val = transaction_status.open + transaction_status.unread.canceled + transaction_status.unread.processed;
+					if (val == 0) {
+						val = '';
+					}
+					$('#navbar_menu_transactions_unread').html(val);
+					$('#menu_transactions_unread').html(val);
+
+					//update transaction counters
+					if (transaction_status.open > 0) {
+						val = transaction_status.open;
+					} else {
+						val = '';
+					}
+					$('#transactions_group_open .badge').html(val);
+
+					if (transaction_status.unread.canceled > 0) {
+						val = transaction_status.unread.canceled;
+					} else {
+						val = '';
+					}
+					$('#transactions_group_canceled .badge').html(val);
+
+					if (transaction_status.unread.processed > 0) {
+						val = transaction_status.unread.processed;
+					} else {
+						val = '';
+					}
+					$('#transactions_group_processed .badge').html(val);
+
+				}
+			}
+		} //ajax options
+	);
 }

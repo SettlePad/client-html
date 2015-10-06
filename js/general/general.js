@@ -1,6 +1,11 @@
 $(document).ready(function(){
 	//Prep callapse menu
 	 $('#collapse_navbar').collapse({'toggle': false});
+
+	 //initiate metadata_sync (poll)
+	 sync_metadata(); //Check whether contacts etc. should be obtained, and if so, do so
+
+
 	//Load content
 	$(window).hashchange();
 });	//executed after the page has loaded
@@ -107,7 +112,6 @@ $(window).hashchange( function(){
 		//Logged in
 		$('#username_top').html(localStorage.getItem('user_name'));
 		$('#username_left').html(localStorage.getItem('user_name'));
-		sync_metadata_if_needed(); //Check whether contacts etc. should be obtained, and if so, do so
 
 		if (hash_split[0] == 'transactions') {
 			search = '';
@@ -167,6 +171,7 @@ $('#loginForm').submit(function() {
 
 				$.bootstrapGrowl('Logged in', {'delay':2000, 'type':'success'});
 				$('#loginModal').modal('hide');
+				sync_metadata_now();
 				$(window).hashchange();
 			},
 			error: function(xhr, errorType, exception) {
@@ -313,8 +318,8 @@ function logout(also_on_server) {
 		if (/^user_/.test(key)) localStorage.removeItem(key); //kill all localstorage items starting with user_
 	});
 	contacts = []; //dict
-	metadata_last_update = 0;
 	identifiers = []; //array*/
+	var transaction_status = {latest: null, open: 0, unread: {open: 0, processed: 0, canceled: 0}};
 
 	$("#content").html('');
 	document.location.hash = '';
