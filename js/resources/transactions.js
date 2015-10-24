@@ -17,7 +17,7 @@ function transactions_init(group) {
           transactions_newest_id = data.data.newest_id;
           transactions_last_update = data.data.last_update;
           transactions_end_reached = (data.data.transactions.length < transaction_max_request);
-          $("#content").html(compiledTemplate({transactions_present: true, search: transactions_search, unread_open: transaction_status.open, unread_processed: transaction_status.unread.processed, unread_canceled: transaction_status.unread.canceled}));
+          $("#content").html(compiledTemplate({transactions_present: true, search: transactions_search, unread_open: transaction_status.unread.open, unread_processed: transaction_status.unread.processed, unread_canceled: transaction_status.unread.canceled}));
           var compiledTemplate = Handlebars.getTemplate('transactions_list');
           $("#transactions_list").html(compiledTemplate({transactions: transactions_format(data.data.transactions)}));
           if (transactions_end_reached) {
@@ -25,7 +25,7 @@ function transactions_init(group) {
             $("#transactions_load_button").addClass('hidden'); //Hide load more button
           }
         } else {
-          $("#content").html(compiledTemplate({transactions_present: false, search: transactions_search, unread_open: transaction_status.open, unread_processed: transaction_status.unread.processed, unread_canceled: transaction_status.unread.canceled}));
+          $("#content").html(compiledTemplate({transactions_present: false, search: transactions_search, unread_open: transaction_status.unread.open, unread_processed: transaction_status.unread.processed, unread_canceled: transaction_status.unread.canceled}));
         }
 
         //Activate correct group pill

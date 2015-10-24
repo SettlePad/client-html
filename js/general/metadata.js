@@ -150,12 +150,12 @@ function poll_status() {
 		false, //notification
 		{
 			success: function(data){
-				if (transaction_status.last_update == null || transaction_status.last_update < moment(data['latest'])) {
-					transaction_status.last_update = moment(data['latest']);
-					transaction_status.open = data.open;
-					transaction_status.unread = data.unread;
+				if (transaction_status.last_update == null || transaction_status.last_update < moment(data.data['latest'])) {
+					transaction_status.last_update = moment(data.data['latest']);
+					transaction_status.open = data.data.open;
+					transaction_status.unread = data.data.unread;
 
-					var val = transaction_status.open + transaction_status.unread.canceled + transaction_status.unread.processed;
+					var val = transaction_status.unread.open + transaction_status.unread.canceled + transaction_status.unread.processed;
 					if (val == 0) {
 						val = '';
 					}
@@ -163,8 +163,8 @@ function poll_status() {
 					$('#menu_transactions_unread').html(val);
 
 					//update transaction counters
-					if (transaction_status.open > 0) {
-						val = transaction_status.open;
+					if (transaction_status.unread.open > 0) {
+						val = transaction_status.unread.open;
 					} else {
 						val = '';
 					}
