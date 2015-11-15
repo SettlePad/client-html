@@ -20,45 +20,49 @@ jQuery.ajaxWrapper = function(resource, type, secure, data, notification, ajaxOp
 		var data = '';
 		var contenttype = 'application/x-www-form-urlencoded; charset=UTF-8'; //is actually only true for POST requests, but this is default, see http://api.jquery.com/jquery.ajax/
 	}
-	$.ajax($.extend({
-		type: type,
-		contentType: contenttype,
-		url: "http://127.0.0.1/api/"+resource, //local
-		//url: "http://www.settlepad.com/api/"+resource, //web
-		dataType: "json",
-		data: data,
-		beforeSend: function(jqXHR, settings){
-			var timestamp = Math.round((new Date()).getTime() / 1000);
-			jqXHR.setRequestHeader('X-TIME', timestamp);
-			if (secure) {
-				if(type =='POST') {
-					var hash = CryptoJS.HmacSHA256(localStorage.getItem('user_series')+timestamp+data, localStorage.getItem('user_token')).toString();
-				} else {
-					var hash = CryptoJS.HmacSHA256(localStorage.getItem('user_series')+timestamp, localStorage.getItem('user_token')).toString();
+	if(localStorage.getItem('user_id') === null && secure) {
+		console.log('Tried to call '+resource+' while not logged in.');
+	} else {
+		$.ajax($.extend({
+			type: type,
+			contentType: contenttype,
+			url: "http://127.0.0.1/"+resource, //local
+			//url: "https://api.settlepad.com/"+resource, //web
+			dataType: "json",
+			data: data,
+			beforeSend: function(jqXHR, settings){
+				var timestamp = Math.round((new Date()).getTime() / 1000);
+				jqXHR.setRequestHeader('X-TIME', timestamp);
+				if (secure) {
+					if(type =='POST') {
+						var hash = CryptoJS.HmacSHA256(localStorage.getItem('user_series')+timestamp+data, localStorage.getItem('user_token')).toString();
+					} else {
+						var hash = CryptoJS.HmacSHA256(localStorage.getItem('user_series')+timestamp, localStorage.getItem('user_token')).toString();
+					}
+					jqXHR.setRequestHeader('X-HASH', hash);
+					jqXHR.setRequestHeader('X-USER-ID', localStorage.getItem('user_id'));
+					jqXHR.setRequestHeader('X-SERIES', localStorage.getItem('user_series'));
 				}
-				jqXHR.setRequestHeader('X-HASH', hash);
-				jqXHR.setRequestHeader('X-USER-ID', localStorage.getItem('user_id'));
-				jqXHR.setRequestHeader('X-SERIES', localStorage.getItem('user_series'));
-			}
-			if (notification) {
-				alert = $.bootstrapGrowl("Loading...");
-			}
-		},
-		complete: function(jqXHR, textStatus){
-			if (notification) {
-				alert.alert("close");
-			}
+				if (notification) {
+					alert = $.bootstrapGrowl("Loading...");
+				}
+			},
+			complete: function(jqXHR, textStatus){
+				if (notification) {
+					alert.alert("close");
+				}
 
-			if (textStatus == 'error') {
-				try {
-					var error_data = $.parseJSON(jqXHR.responseText);
-					$.bootstrapGrowl(error_data.error.text, {'delay':2000, 'type':'danger'});
-				 } catch (e) {
-						$.bootstrapGrowl('Unknown error!', {'delay':2000, 'type':'danger'});
+				if (textStatus == 'error') {
+					try {
+						var error_data = $.parseJSON(jqXHR.responseText);
+						$.bootstrapGrowl(error_data.error.text, {'delay':2000, 'type':'danger'});
+					 } catch (e) {
+							$.bootstrapGrowl('Unknown error!', {'delay':2000, 'type':'danger'});
+					}
 				}
 			}
-		}
-  }, ajaxOptions));
+	  }, ajaxOptions));
+	}
 }
 
 //Bind an event to window.onhashchange that, when the hash changes, gets the hash and adds the class "selected" to any matching nav link.

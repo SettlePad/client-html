@@ -151,7 +151,7 @@ function send_send() {
       'memo/send/', //resource
       'POST', //type
       true, //secure
-      send_list, //data,
+      {transactions: send_list}, //data,
       true, //notification
       {
         success: function(data){
