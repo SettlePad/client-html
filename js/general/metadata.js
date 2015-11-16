@@ -62,7 +62,11 @@ function contacts_get(show_connections, show_connection_identifier) {
 		show_connections, //notification
 		{
 			success: function(data){
-				contacts = data.data;
+				if ($.isArray(data.data)) {
+					contacts = data.data;
+				} else {
+					contacts = [];
+				}
 				contacts_add_metadata();
 				if(show_connections) {
 					connections_load();
