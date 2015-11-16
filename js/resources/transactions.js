@@ -24,6 +24,7 @@ function transactions_init(group) {
             $("#transactions_end_reached").removeClass('hidden'); //Hide load more button
             $("#transactions_load_button").addClass('hidden'); //Hide load more button
           }
+          transations_are_shown();
         } else {
           $("#content").html(compiledTemplate({transactions_present: false, search: transactions_search, unread_open: transaction_status.unread.open, unread_processed: transaction_status.unread.processed, unread_canceled: transaction_status.unread.canceled}));
         }
@@ -66,6 +67,7 @@ function transactions_older() {
             } else {
               $("#transactions_load_button").removeClass('hidden'); //Hide load more button
             }
+            transations_are_shown();
           }
           $("#transactions_load_loader").addClass('hidden'); //Show AJAX loader ball
           transactions_loading = false;
@@ -73,23 +75,6 @@ function transactions_older() {
       } //ajax options
     );
   }
-}
-
-function transactions_newer() {
-  $.ajaxWrapper(
-    'transactions/newer/'+transactions_newest_id+'/'+transaction_max_request+'/'+transactions_group+'/'+encodeURIComponent(transactions_search)+'/', //resource
-    'GET', //type
-    true, //secure
-    {}, //data,
-    true, //notification
-    {
-      success: function(data){
-        if (data.data !== null) {
-          transactions_newest_id = data.data.newest_id;
-        }
-      }
-    } //ajax options
-  );
 }
 
 function transactions_update() {
@@ -107,6 +92,7 @@ function transactions_update() {
           $.each(data.data.transactions, function(i, transaction) {
             $('#transaction_'+transaction.transaction_id).replaceWith(compiledTemplate({transactions: transactions_format([transaction])}));
           });
+          transations_are_shown();
         }
       }
     } //ajax options
@@ -153,6 +139,11 @@ function transactions_format(data) {
         data[index].reduced = false;
       }
 
+      if (data[index].is_read == 0) {
+        data[index].is_read = false;
+      } else {
+        data[index].is_read = true;
+      }
 
       contactObj = contact_get_by_identifier(data[index].counterpart_primary_identifier);
       if (contactObj != null) {
@@ -162,6 +153,18 @@ function transactions_format(data) {
     }
   }
   return data;
+}
+
+function transations_are_shown(){
+  //Do js work after transactions are visible
+  $('#transactions_list > .list-group-item-success').removeClass('list-group-item-success',
+    {
+      duration: 5000,
+      complete: function() {
+        //mark as read
+      }
+    }
+  )
 }
 
 function element_in_scroll(elem) {
