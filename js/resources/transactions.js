@@ -141,6 +141,7 @@ function transactions_format(data) {
 
       if (data[index].is_read == 0) {
         data[index].is_read = false;
+        transaction_accept(data[index].transaction_id, 'mark_read',false);
       } else {
         data[index].is_read = true;
       }
@@ -159,10 +160,7 @@ function transations_are_shown(){
   //Do js work after transactions are visible
   $('#transactions_list > .list-group-item-success').removeClass('list-group-item-success',
     {
-      duration: 5000,
-      complete: function() {
-        //mark as read
-      }
+      duration: 5000
     }
   )
 }
@@ -197,7 +195,7 @@ $(document).scroll(function(e){
   }
 });
 
-function transaction_accept(id, action) {
+function transaction_accept(id, action,reload) {
   $.ajaxWrapper(
     'transactions/'+action+'/'+id, //resource
     'POST', //type
@@ -206,7 +204,9 @@ function transaction_accept(id, action) {
     false, //notification
     {
       success: function(data){
-        transactions_init(false);
+        if (reload) {
+          transactions_init(false);
+        }
       }
     } //ajax options
   );
