@@ -158,11 +158,16 @@ function transactions_format(data) {
 
 function transations_are_shown(){
   //Do js work after transactions are visible
-  $('#transactions_list > .list-group-item-success').removeClass('list-group-item-success',
-    {
-      duration: 5000
-    }
-  )
+  if ($('#transactions_list > .list-group-item-success').length > 0) {
+    $('#transactions_list > .list-group-item-success').removeClass('list-group-item-success',
+      {
+        duration: 5000,
+        completed: function() {
+          poll_status();
+        }
+      }
+    )
+  }
 }
 
 function element_in_scroll(elem) {
