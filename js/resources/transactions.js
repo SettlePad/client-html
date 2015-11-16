@@ -2,7 +2,7 @@ transaction_max_request =20;
 transactions_search = '';
 transactions_group = 'open';
 function transactions_init(group) {
-  if (group != null && group != '') transactions_group = group;
+  if (group != null && group != '' && group != false) transactions_group = group;
   $.ajaxWrapper(
     'transactions/initial/'+transaction_max_request+'/'+transactions_group+'/'+encodeURIComponent(transactions_search)+'/', //resource
     'GET', //type
@@ -203,7 +203,7 @@ function transaction_accept(id, action) {
     false, //notification
     {
       success: function(data){
-        transactions_update();
+        transactions_init(false);
       }
     } //ajax options
   );
