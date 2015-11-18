@@ -24,7 +24,7 @@ function transactions_init(group) {
             $("#transactions_end_reached").removeClass('hidden'); //Hide load more button
             $("#transactions_load_button").addClass('hidden'); //Hide load more button
           }
-          transations_are_shown();
+          transactions_are_shown(data.data.transactions);
         } else {
           $("#content").html(compiledTemplate({transactions_present: false, search: transactions_search, unread_open: transaction_status.unread.open, unread_processed: transaction_status.unread.processed, unread_canceled: transaction_status.unread.canceled}));
         }
@@ -67,7 +67,7 @@ function transactions_older() {
             } else {
               $("#transactions_load_button").removeClass('hidden'); //Hide load more button
             }
-            transations_are_shown();
+            transactions_are_shown(data.data.transactions);
           }
           $("#transactions_load_loader").addClass('hidden'); //Show AJAX loader ball
           transactions_loading = false;
@@ -92,7 +92,7 @@ function transactions_update() {
           $.each(data.data.transactions, function(i, transaction) {
             $('#transaction_'+transaction.transaction_id).replaceWith(compiledTemplate({transactions: transactions_format([transaction])}));
           });
-          transations_are_shown();
+          transactions_are_shown(data.data.transactions);
         }
       }
     } //ajax options
@@ -141,7 +141,6 @@ function transactions_format(data) {
 
       if (data[index].is_read == 0) {
         data[index].is_read = false;
-        transaction_accept(data[index].transaction_id, 'mark_read',false);
       } else {
         data[index].is_read = true;
       }
@@ -156,17 +155,27 @@ function transactions_format(data) {
   return data;
 }
 
-function transations_are_shown(){
+function transactions_are_shown(transactions){
   //Do js work after transactions are visible
   if ($('#transactions_list > .list-group-item-success').length > 0) {
     $('#transactions_list > .list-group-item-success').removeClass('list-group-item-success',
       {
         duration: 5000,
-        completed: function() {
+        complete: function() {
           poll_status();
         }
       }
     )
+  }
+
+  transactions_to_mark_as_read = [];
+  for (index = 0; index < transactions.length; ++index) {
+    if (transactions[index].is_read == 0) {
+      transactions_to_mark_as_read.push(transactions[index].transaction_id);
+    }
+  }
+  if (transactions_to_mark_as_read.length > 0) {
+      transaction_accept(transactions_to_mark_as_read, 'mark_read',false);
   }
 }
 
@@ -201,11 +210,19 @@ $(document).scroll(function(e){
 });
 
 function transaction_accept(id, action,reload) {
+  if ($.isArray(id)) {
+    resource = 'transactions/'+action;
+    payload = {'transactions': id};
+  } else {
+    resource = 'transactions/'+action+'/'+id;
+    payload = {};
+  }
+
   $.ajaxWrapper(
-    'transactions/'+action+'/'+id, //resource
+    resource, //resource
     'POST', //type
     true, //secure
-    {}, //data,
+    payload, //data,
     false, //notification
     {
       success: function(data){
