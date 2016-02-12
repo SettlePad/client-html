@@ -77,3 +77,10 @@ only screen and (min-device-pixel-ratio: 2) {
 .forgot_pwd_div {
 	margin-top: 10px;
 }
+
+
+/* To make sure that the Carousel is still responsive */
+.carousel-inner img{
+	max-width: 100%;
+	height: auto;
+}
