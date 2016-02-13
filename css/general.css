@@ -79,8 +79,13 @@ only screen and (min-device-pixel-ratio: 2) {
 }
 
 
-/* To make sure that the Carousel is still responsive */
-.carousel-inner img{
-	max-width: 100%;
-	height: auto;
+/* To fix iOS 9-bug, see
+	http://stackoverflow.com/questions/32675849/screen-zooms-in-when-a-bootstrap-modal-is-opened-on-ios-9-safari
+*/
+body {
+  padding-right: 0px !important
+}
+
+.modal-open {
+  overflow-y: auto;
 }
