@@ -26,20 +26,13 @@ jQuery.ajaxWrapper = function(resource, type, secure, data, notification, ajaxOp
 		$.ajax($.extend({
 			type: type,
 			contentType: contenttype,
-			//url: "http://127.0.0.1/"+resource, //local
-			url: "https://api.settlepad.com/"+resource, //web
+			url: "http://api.settlepad.local/"+resource, //local
+			//url: "https://api.settlepad.com/"+resource, //web
 			dataType: "json",
 			data: data,
 			beforeSend: function(jqXHR, settings){
 				var timestamp = Math.round((new Date()).getTime() / 1000);
-				jqXHR.setRequestHeader('X-TIME', timestamp);
 				if (secure) {
-					if(type =='POST') {
-						var hash = CryptoJS.HmacSHA256(localStorage.getItem('user_series')+timestamp+data, localStorage.getItem('user_token')).toString();
-					} else {
-						var hash = CryptoJS.HmacSHA256(localStorage.getItem('user_series')+timestamp, localStorage.getItem('user_token')).toString();
-					}
-					jqXHR.setRequestHeader('X-HASH', hash);
 					jqXHR.setRequestHeader('X-USER-ID', localStorage.getItem('user_id'));
 					jqXHR.setRequestHeader('X-SERIES', localStorage.getItem('user_series'));
 				}
@@ -170,6 +163,7 @@ $('#loginForm').submit(function() {
 				localStorage.setItem('user_token', data.token);
 				localStorage.setItem('user_id', data.user_id);
 				localStorage.setItem('user_name', data.user_name);
+				localStorage.setItem('user_iban', data.user_iban);
 				localStorage.setItem('user_default_currency', data.default_currency);
 				identifiers = data.identifiers;
 

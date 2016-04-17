@@ -1,15 +1,20 @@
 {{#each transactions}}
-  <span class="{{#unless is_read}}list-group-item-success{{/unless}} list-group-item" id="transaction_{{transaction_id}}">
+  <span class="{{#unless is_read_bool}}list-group-item-success{{/unless}} list-group-item" id="transaction_{{transaction_id}}">
     <span class="transactions_amount text-{{#if status_canceled}}muted{{else}}{{#if amount_negative}}muted{{else}}success{{/if}}{{/if}}">{{#if status_canceled}}<s>{{/if}}{{currency}} {{amount_formatted}}{{#if status_canceled}}</s>{{/if}}</span>
     <h5 class="list-group-item-heading"><a href="{{#if contact}}#connection/{{counterpart_primary_identifier}}{{else}}javascript:connections_add_submit('{{counterpart_primary_identifier}}');{{/if}}">{{counterpart_name}}</a>{{#if recipient_registered}}<!--({{counterpart_used_identifier}})-->{{else}} (not registered){{/if}} {{#if status_canceled}}<span class="label label-default">canceled</span>{{else}}{{#if status_pending}}<span class="label label-warning">pending approval</span>{{else}}{{#unless reduced}} <span class="label label-info">queued</span> {{/unless}}{{/if}}{{/if}}</h5>
     {{#if can_accept}}
       <span class="list_group_action_right">
-        <a href="javascript:transaction_accept({{transaction_id}}, 'accept', true);">accept</a> &#47;
-        <a href="javascript:transaction_accept({{transaction_id}}, 'reject', true);">reject</a>
+        <a class="btn btn-default btn-xs" href="javascript:transaction_accept({{transaction_id}}, 'accept', true, true);" role="button">accept</a> &#47;
+        <a class="btn btn-default btn-xs" href="javascript:transaction_accept({{transaction_id}}, 'reject', true, true);" role="button">reject</a>
+        <!-- <a href="javascript:transaction_accept({{transaction_id}}, 'accept', true, true);">accept</a> &#47;
+        <a href="javascript:transaction_accept({{transaction_id}}, 'reject', true, true);">reject</a> -->
       </span>
     {{/if}}
     {{#if can_cancel}}
-      <a href="javascript:transaction_accept({{transaction_id}}, 'cancel', true);" class="list_group_action_right">cancel</a>
+      <span class="list_group_action_right">
+        <a class="btn btn-default btn-xs" href="javascript:transaction_accept({{transaction_id}}, 'cancel', true, true);" role="button">cancel</a>
+      </span>
+      <!-- <a href="javascript:transaction_accept({{transaction_id}}, 'cancel', true, true);" class="list_group_action_right">cancel</a> -->
     {{/if}}
     <p class="list-group-item-text">{{description}}</p>
     <p class="list-group-item-text">{{#if is_sender}}Sent{{else}}Received{{/if}}: {{time_sent_humane}}</p>

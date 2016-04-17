@@ -34,6 +34,7 @@ function settings_get(show_settings, show_identifiers) {
 			success: function(data){
 				localStorage.setItem('user_name', data.data.user_name);
 				localStorage.setItem('user_default_currency', data.data.default_currency);
+				localStorage.setItem('user_iban', data.data.user_iban);
 				identifiers = data.data.identifiers;
 				if (identifiers.length > 1) {
 					identifiers.sort(function(a, b){

@@ -112,7 +112,7 @@ function send_add(){
         if (identifier.identifier == $('#sendform_to').val()) {
           // the typeahead jQuery plugin expects suggestions to a
           // JavaScript object, refer to typeahead docs for more info
-          name = contact.name;
+          if (contact.name !== null) name = contact.name;
         }
       });
     });
@@ -120,7 +120,7 @@ function send_add(){
       recipient: $('#sendform_to').val(),
       currency: $('#send_currency').html(),
       name: name,
-      name_available: name != '',
+      name_available: (name != '' && name !== null),
       description: $('#sendform_description').val(),
       amount: amount,
       id: send_list_id

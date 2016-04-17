@@ -1,0 +1,37 @@
+  <div class="modal fade" id="pay_modal" tabindex="-1" role="dialog" aria-labelledby="pay_modal_title">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="pay_modal_title">Pay {{name}}</h4>
+        </div>
+        <div class="modal-body">
+          <p>Please use the details below to pay the amount due. When you click "I paid", a memo for this amount will automatically be generated.</p>
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-2 control-label">Name</label>
+              <div class="col-sm-10">
+                <p class="form-control-static">{{name}}</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">IBAN</label>
+              <div class="col-sm-10">
+                <p class="form-control-static">{{iban}}</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-2 control-label">Amount</label>
+              <div class="col-sm-10">
+                <p class="form-control-static">{{currency}} {{amount}}</p>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <a href="javascript:balance_action('{{primary_identifier}}','pay_memo');" role="button" class="btn btn-primary">I paid</a>
+        </div>
+      </div>
+    </div>
+  </div>

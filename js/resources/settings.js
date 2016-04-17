@@ -7,10 +7,14 @@ function settings_load(){
   }
 
   currency_key = localStorage.getItem('user_default_currency');
-  $("#content").html(compiledTemplate({name: localStorage.getItem('user_name'), login_credentials: login_credentials_count, login_credentials_multiple: login_credentials_count != 1, default_currency: currency_key, contacts_count: contacts.length, contacts_count_multiple: contacts.length != 1}));
+  $("#content").html(compiledTemplate({name: localStorage.getItem('user_name'), iban: localStorage.getItem('user_iban'), login_credentials: login_credentials_count, login_credentials_multiple: login_credentials_count != 1, default_currency: currency_key, contacts_count: contacts.length, contacts_count_multiple: contacts.length != 1}));
 
   $("#settings_name").change(function(e) {
     settings_post('name', e.target.value, true);
+  });
+
+  $("#settings_iban").change(function(e) {
+    settings_post('iban', e.target.value, true);
   });
 
   $("#settings_default_currency").change(function(e) {

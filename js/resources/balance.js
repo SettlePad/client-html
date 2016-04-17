@@ -1,4 +1,7 @@
 var multiple_currencies = true; //becomes true if balance_currencies is called, so that a back link can be shown to the currency overview page
+var selected_currency = false;  //contains data to use in action on individual contact (pay/remind)
+var data_selected_currency = false; //contains data to use in action on individual contact (pay/remind)
+
 function balance_currencies() {
 	var currencies;
 	$.ajaxWrapper(
@@ -37,6 +40,8 @@ function balance_currency(currency) {
 				} else {
 					$("#content").html(compiledTemplate);
 				}
+				selected_currency = currency;
+				data_selected_currency = data.data.connections[currency];
 			}
 		} //ajax options
 	);
@@ -83,4 +88,63 @@ function balance_format_connections(data) {
 		}
 	}
 	return data;
+}
+
+function balance_action(primary_identifier, action) {
+	//Check whether data can be found
+	selected_user = false;
+	for (i=0; i < data_selected_currency.length; i++) {
+		if (data_selected_currency[i].primary_identifier == primary_identifier) {
+			selected_user = data_selected_currency[i];
+		}
+	}
+
+	if (selected_user !== false) {
+		if (action == 'remind' && selected_user.balance > 0) {
+			if (localStorage.getItem('user_iban') == '') {
+				$.bootstrapGrowl('You first have to provide your IBAN (in settings).', {'delay':2000, 'type':'danger'});
+			} else {
+				$.ajaxWrapper(
+					'remind/', //resource
+					'POST', //type
+					true, //secure
+					{identifier: primary_identifier}, //data,
+					true, //notification
+					{
+						success: function(data){
+							if (data.data !== null) {
+								$.bootstrapGrowl('Reminder sent.', {'delay':2000, 'type':'success'});
+							}
+						}
+					} //ajax options
+				);
+			}
+
+		} else if (action == 'pay' &&  selected_user.balance < 0) {
+			//Show modal with IBAN
+			var compiledTemplate = Handlebars.getTemplate('balance_currency_pay_modal');
+			$("#pay_modal_container").html(compiledTemplate({name: selected_user.name, primary_identifier: primary_identifier, iban: selected_user.iban, currency: selected_currency, amount: number_format(-1*selected_user.balance,2,true)}));
+			$('#pay_modal').modal();
+		} else if (action == 'pay_memo' &&  selected_user.balance < 0) {
+			$('#pay_modal').on('hidden.bs.modal', function (e) {
+				$.ajaxWrapper(
+					'memo/send/', //resource
+					'POST', //type
+					true, //secure
+					{transactions: [{recipient: primary_identifier, description: 'Settlement of outstanding amount by bank transfer', amount: -1*selected_user.balance, currency: selected_currency}]}, //data,
+					true, //notification
+					{
+						success: function(data){
+							if (data.data !== null) {
+								balance_currency(selected_currency);
+								$.bootstrapGrowl('Settlement memo sent. Not right? You can cancel it for 5 minutes.', {'delay':2000, 'type':'success'});
+							}
+						}
+					} //ajax options
+				);
+				// do something...
+			});
+			$('#pay_modal').modal('hide');
+		}
+	}
 }

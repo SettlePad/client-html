@@ -6,7 +6,7 @@
         <th></th>
         <th class="text_right">You owe<br><small class="text-muted">{{selected_currency}}</small></th>
         <th class="text_right">You get<br><small class="text-muted">{{selected_currency}}</small></th>
-        <!--<th class="text_right">Balance</th>-->
+        <th class="text_right"></th>
         </tr>
       </thead>
       <tbody>
@@ -15,20 +15,20 @@
           <td><a href="{{#if contact}}#connection/{{primary_identifier}}{{else}}javascript:connections_add_submit('{{primary_identifier}}');{{/if}}">{{name}}</a> {{#unless favorite}}<span class="glyphicon glyphicon-thumbs-down"></span>{{/unless}} {{#if unprocessed}}<span class="label label-info">queued</span> {{/if}}</td>
           <td class="text_right">{{#if balance_negative}}<span class="text-danger">{{balance_formatted}}</span>{{/if}}</td>
           <td class="text_right">{{#unless balance_negative}}<span class="text-success">{{balance_formatted}}</span>{{/unless}}</td>
-          <!-- <td class="text_right"><span class="text-{{#if balance_negative}}danger{{else}}success{{/if}}">{{balance_formatted}}</span></td> -->
+          <td class="text_right">{{#if balance_negative}}<a class="btn btn-default btn-xs" href="javascript:balance_action('{{primary_identifier}}', 'pay');" role="button">Pay</a>{{else}}<a class="btn btn-default btn-xs" href="javascript:balance_action('{{primary_identifier}}', 'remind');" role="button">Remind</a>{{/if}}</td>
           </tr>
         {{/each}}
         <tr class="active text_bold">
           <td>Sum</td>
           <td class="text_right"><span class="text-danger">{{#if balances.owe_active}}{{balances.owe_formatted}}{{/if}}</span></td>
           <td class="text_right"><span class="text-success">{{#if balances.get_active}}{{balances.get_formatted}}{{/if}}</span></td>
-          <!-- <td class="text_right"><span class="text-{{#if balances.balance_negative}}danger{{else}}success{{/if}}">{{balances.balance_formatted}}</span></td> -->
+          <td class="text_right"></td>
         </tr>
         <tr class="text_bold">
           <td>Balance</td>
           <td class="text_right"><span class="text-danger">{{#if balances.balance_negative}}{{balances.balance_formatted}}{{/if}}</span></td>
           <td class="text_right"><span class="text-success">{{#unless balances.balance_negative}}{{balances.balance_formatted}}{{/unless}}</span></td>
-          <!-- <td class="text_right"><span class="text-{{#if balances.balance_negative}}danger{{else}}success{{/if}}">{{balances.balance_formatted}}</span></td> -->
+          <td class="text_right"></td>
         </tr>
       </tbody>
      </table>
@@ -38,3 +38,5 @@
   <p>You do not get anything or owe anyone in this currency.</p>
   <a href="#balance">Go back</a>
 {{/if}}
+
+<div id="pay_modal_container"></div>

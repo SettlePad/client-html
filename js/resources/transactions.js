@@ -139,10 +139,10 @@ function transactions_format(data) {
         data[index].reduced = false;
       }
 
-      if (data[index].is_read == 0) {
-        data[index].is_read = false;
+      if (data[index].is_read == 1) {
+        data[index].is_read_bool = true;
       } else {
-        data[index].is_read = true;
+        data[index].is_read_bool = false;
       }
 
       contactObj = contact_get_by_identifier(data[index].counterpart_primary_identifier);
@@ -170,12 +170,12 @@ function transactions_are_shown(transactions){
 
   transactions_to_mark_as_read = [];
   for (index = 0; index < transactions.length; ++index) {
-    if (transactions[index].is_read == 0) {
+    if (transactions[index].is_read != 1) {
       transactions_to_mark_as_read.push(transactions[index].transaction_id);
     }
   }
   if (transactions_to_mark_as_read.length > 0) {
-      transaction_accept(transactions_to_mark_as_read, 'mark_read',false);
+      transaction_accept(transactions_to_mark_as_read, 'mark_read',false, false);
   }
 }
 
@@ -209,27 +209,29 @@ $(document).scroll(function(e){
   }
 });
 
-function transaction_accept(id, action,reload) {
-  if ($.isArray(id)) {
-    resource = 'transactions/'+action;
-    payload = {'transactions': id};
-  } else {
-    resource = 'transactions/'+action+'/'+id;
-    payload = {};
-  }
+function transaction_accept(id, action, reload, ask_confirmation) {
+  if (!ask_confirmation || confirm("Are you sure?") == true) {
+    if ($.isArray(id)) {
+      resource = 'transactions/'+action;
+      payload = {'transactions': id};
+    } else {
+      resource = 'transactions/'+action+'/'+id;
+      payload = {};
+    }
 
-  $.ajaxWrapper(
-    resource, //resource
-    'POST', //type
-    true, //secure
-    payload, //data,
-    false, //notification
-    {
-      success: function(data){
-        if (reload) {
-          transactions_init(false);
+    $.ajaxWrapper(
+      resource, //resource
+      'POST', //type
+      true, //secure
+      payload, //data,
+      false, //notification
+      {
+        success: function(data){
+          if (reload) {
+            transactions_init(false);
+          }
         }
-      }
-    } //ajax options
-  );
+      } //ajax options
+    );
+  }
 }
