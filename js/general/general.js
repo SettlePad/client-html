@@ -164,6 +164,7 @@ $('#loginForm').submit(function() {
 				localStorage.setItem('user_id', data.user_id);
 				localStorage.setItem('user_name', data.user_name);
 				localStorage.setItem('user_iban', data.user_iban);
+				localStorage.setItem('user_notify_by_mail', JSON.stringify(data.user_notify_by_mail)); //To save a bool as string
 				localStorage.setItem('user_default_currency', data.default_currency);
 				identifiers = data.identifiers;
 
