@@ -91,19 +91,19 @@ $(window).hashchange( function(){
 			$('#registerModalName').val("");
 			$('#registerModalEmail').val("");
 			$('#registerModalPassword').html("");
-			$('#registerModal').modal({keyboard: false, backdrop: 'static'});
+			$('#registerModal').modal();
 		} else if (hash_split[0] == 'verify') {
 			$('.modal').modal('hide'); //Hide all modals
 			$('#verifyIdentifierModalToken').html("");
 			$('#verifyIdentifierModalIdentifier').html(hash_split[1]);
-			$('#verifyIdentifierModal').modal({keyboard: false, backdrop: 'static'});
+			$('#verifyIdentifierModal').modal();
 		} else {
 			$('.modal').modal('hide'); //Hide all modals
 			$('#loginEmail').val("");
 			$('#loginPassword').val("");
 			$('#username_top').html("");
 			$('#username_left').html("");
-			$('#loginModal').modal({keyboard: false, backdrop: 'static'});
+			$('#loginModal').modal();
 		}
 	} else {
 		//Logged in
@@ -181,9 +181,9 @@ $('#loginForm').submit(function() {
 				if (error_data.error.code == 'incorrect_credentials') {
 					$('#loginModal').modal('hide');
 					//$('#loginModal').on('hidden.bs.modal', function (e) {
-					$('#requestPasswordResetModal').modal({keyboard: false, backdrop: 'static'});
+					$('#requestPasswordResetModal').modal();
 					$('#requestPasswordResetModal').on('hidden.bs.modal', function (e) {
-						$('#loginModal').modal({keyboard: false, backdrop: 'static'});
+						$('#loginModal').modal();
 					});
 					//});
 				} else if (error_data.error.code == 'not_validated') {
@@ -262,9 +262,9 @@ function change_password_submit() {
 function change_password_form(sender) {
 	$(sender).unbind();
 	$(sender).modal('hide');
-	$('#resetPasswordModal').modal({keyboard: false, backdrop: 'static'});
+	$('#resetPasswordModal').modal();
 	$('#resetPasswordModal').on('hidden.bs.modal', function (e) {
-		$('#loginModal').modal({keyboard: false, backdrop: 'static'});
+		$('#loginModal').modal();
 	});
 }
 
