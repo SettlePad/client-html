@@ -26,8 +26,8 @@ jQuery.ajaxWrapper = function(resource, type, secure, data, notification, ajaxOp
 		$.ajax($.extend({
 			type: type,
 			contentType: contenttype,
-			url: "http://api.settlepad.local/"+resource, //local
-			//url: "https://api.settlepad.com/"+resource, //web
+			//url: "http://api.settlepad.local/"+resource, //local
+			url: "https://api.settlepad.com/"+resource, //web
 			dataType: "json",
 			data: data,
 			beforeSend: function(jqXHR, settings){
