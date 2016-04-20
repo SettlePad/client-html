@@ -119,6 +119,8 @@ $(window).hashchange( function(){
 			balance_currencies();
 		} else if (hash_split[0] == 'balance') {
 			balance_currency(hash_split[1]);
+		} else if (hash == 'message') {
+			message_load();
 		} else if (hash == 'settings') {
 			settings_get(true,false);
 		} else if (hash == 'connections') {
